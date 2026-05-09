@@ -1,0 +1,25 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+*.swp
+.vscode/
+.idea/
+results/
+/docs/
+
+# Wallclock benchmark outputs (keep README.md + dated run snapshots, ignore loose JSON/JSONL/logs)
+runs/bench/*.json
+runs/bench/*.jsonl
+runs/bench/plots/
+runs/bench/run.log
+runs/bench/nvsmi.log
+# Allow committed run snapshots in dated subdirectories
+!runs/bench/*/

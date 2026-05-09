@@ -1,0 +1,44 @@
+{
+  "cell_id": "G3",
+  "phase": "2_verification",
+  "compute_budget_target_flops": 6e19,
+  "_TEMPLATE_NOTE": "Held-out extrapolation run. depth, hidden_size, num_attention_heads, num_key_value_heads, intermediate_size, target_param_data_ratio AUTO-FILLED from Phase 1 fit. DO NOT submit this file directly.",
+  "architecture_config": {
+    "head_dim": 128,
+    "hidden_size": null,
+    "intermediate_size": null,
+    "num_attention_heads": null,
+    "num_hidden_layers": null,
+    "num_key_value_heads": null,
+    "rms_norm_eps": 1e-6,
+    "rope_theta": 1000000,
+    "tie_word_embeddings": false,
+    "dtype": "bfloat16",
+    "vocab_size": 32000
+  },
+  "moe_config": {
+    "num_experts": 8,
+    "top_k": 2,
+    "num_shared_experts": 1
+  },
+  "multimodal_config": {
+    "enabled": true,
+    "mix_ratio_r": 0.3,
+    "freeze_vision": true,
+    "freeze_merger_after_warmup_frac": 0.05
+  },
+  "optimizer_config": {
+    "matrix_lr": 0.02,
+    "embedding_lr": 0.3,
+    "unembedding_lr": 0.008,
+    "scalar_lr": 0.5,
+    "weight_decay": 0.28,
+    "warmup_frac": 0.05,
+    "final_lr_frac": 0.05
+  },
+  "max_seq_len": 4096,
+  "target_param_data_ratio": null,
+  "max_runtime_seconds": 15600,
+  "model_seed": 0,
+  "n_evals": 16
+}

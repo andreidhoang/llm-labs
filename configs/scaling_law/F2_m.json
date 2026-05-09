@@ -1,0 +1,43 @@
+{
+  "cell_id": "F2.m",
+  "phase": "1_fitting",
+  "compute_budget_target_flops": 1.5e19,
+  "architecture_config": {
+    "head_dim": 128,
+    "hidden_size": 1536,
+    "intermediate_size": 6144,
+    "num_attention_heads": 12,
+    "num_hidden_layers": 24,
+    "num_key_value_heads": 12,
+    "rms_norm_eps": 1e-6,
+    "rope_theta": 1000000,
+    "tie_word_embeddings": false,
+    "dtype": "bfloat16",
+    "vocab_size": 32000
+  },
+  "moe_config": {
+    "num_experts": 8,
+    "top_k": 2,
+    "num_shared_experts": 1
+  },
+  "multimodal_config": {
+    "enabled": true,
+    "mix_ratio_r": 0.3,
+    "freeze_vision": true,
+    "freeze_merger_after_warmup_frac": 0.05
+  },
+  "optimizer_config": {
+    "matrix_lr": 0.02,
+    "embedding_lr": 0.3,
+    "unembedding_lr": 0.008,
+    "scalar_lr": 0.5,
+    "weight_decay": 0.28,
+    "warmup_frac": 0.05,
+    "final_lr_frac": 0.05
+  },
+  "max_seq_len": 4096,
+  "target_param_data_ratio": 5,
+  "max_runtime_seconds": 5700,
+  "model_seed": 0,
+  "n_evals": 16
+}

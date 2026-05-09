@@ -1,0 +1,23 @@
+# torch 2.6+ required for torch._grouped_mm (used by core/moe.py).
+# NGC image nvcr.io/nvidia/pytorch:25.01-py3 ships torch 2.6.0a0 — compatible.
+# For local CPU dev / testing, any torch >= 2.6 works.
+torch>=2.6.0,<2.8
+# flash-attn 3 (Hopper-only, sm_90+) is REQUIRED for production bench but provided
+# by the NGC pytorch:25.01-py3 image (DO NOT pip install on a runtime image — needs nvcc).
+# flash-attn>=3.0.0b1  # uncomment ONLY when using a devel image with nvcc
+numpy
+pandas
+einx
+einops
+jaxtyping
+pyarrow
+psutil
+requests
+PyYAML
+wandb
+tokenizers
+rustbpe
+tiktoken
+filelock
+Jinja2
+triton
