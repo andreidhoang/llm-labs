@@ -59,7 +59,7 @@ class MultimodalConfig:
 
     # PatchMerger (vision-to-LLM projector)
     spatial_merge_size: int = 2             # 2x2 spatial compression
-    freeze_merger: bool = True              # frozen after warmup; eliminates Plan §3 projector confound
+    freeze_merger: bool = False             # train fresh connector unless explicitly frozen
     merger_warmup_steps: int = 0            # 0 = freeze immediately (no warmup); >0 = train then freeze
 
     # VIDEO: add when enabling video path:
@@ -327,8 +327,8 @@ class VisionTower(nn.Module):
     """Frozen SigLIP2-SO400M vision encoder + PatchMerger projection.
 
     SigLIP2 weights are loaded from HF (`google/siglip2-so400m-patch14-384`
-    by default) with requires_grad=False. PatchMerger is freeze-able via
-    config; default is to freeze immediately.
+    by default) with requires_grad=False. PatchMerger is trainable by default
+    for fresh models, and can be frozen for controlled ablations.
 
     Forward:
         pixel_values: (N_images, 3, H, W) — preprocessed by HF AutoImageProcessor
@@ -354,7 +354,7 @@ class VisionTower(nn.Module):
         llm_hidden_size: int,
         siglip_model_id: str = "google/siglip2-so400m-patch14-384",
         spatial_merge_size: int = 2,
-        freeze_merger: bool = True,
+        freeze_merger: bool = False,
         vision_encoder: nn.Module | None = None,
         vision_embed_dim: int | None = None,
     ):
@@ -382,6 +382,12 @@ class VisionTower(nn.Module):
         self.merger = PatchMerger(self.vision_embed_dim, llm_hidden_size, spatial_merge_size)
         if freeze_merger:
             self.freeze_merger_now()
+
+    def train(self, mode: bool = True):
+        """Keep frozen SigLIP in eval mode while allowing PatchMerger to train."""
+        super().train(mode)
+        self.siglip.eval()
+        return self
 
     def forward(
         self,

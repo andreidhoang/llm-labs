@@ -8,7 +8,7 @@
 #   GPUS              number of GPUs to rent (default 2)
 #   BRANCH            git branch to bench (default wallclock-port)
 #   GH_REPO           owner/repo (default andreidhoang/ai_labs_2026)
-#   IMAGE             Docker image to rent with (default nvcr.io/nvidia/pytorch:25.01-py3)
+#   IMAGE             Docker image to rent with (default nvcr.io/nvidia/pytorch:25.03-py3)
 #   DISK              disk GB (default 80)
 #   DEPTH             model depth for bench (default 12)
 #   DBS               device batch size (default 8)
@@ -35,7 +35,7 @@ set -euo pipefail
 GPUS="${GPUS:-2}"
 BRANCH="${BRANCH:-wallclock-port}"
 GH_REPO="${GH_REPO:-andreidhoang/ai_labs_2026}"
-IMAGE="${IMAGE:-nvcr.io/nvidia/pytorch:25.01-py3}"
+IMAGE="${IMAGE:-nvcr.io/nvidia/pytorch:25.03-py3}"
 DISK="${DISK:-80}"
 DEPTH="${DEPTH:-12}"
 DBS="${DBS:-8}"
@@ -67,7 +67,7 @@ if [[ -n "${OFFER_ID:-}" ]]; then
 else
   echo "▶ Searching for ${GPUS}×H100 offers (SXM preferred, PCIE/NVL fallback)..."
   OFFER=$(vastai search offers \
-    "num_gpus=$GPUS gpu_name in [H100_SXM,H100_PCIE,H100_NVL] reliability>0.95 verified=true" \
+    "num_gpus=$GPUS gpu_name in [H100_SXM,H100_PCIE,H100_NVL] reliability>0.95 verified=true cuda_max_good>=12.8" \
     -o 'dph_total' --raw 2>/dev/null \
     | python3 -c "
 import sys, json
@@ -87,10 +87,27 @@ read -r OFFER_ID OFFER_HR OFFER_REL OFFER_CUDA OFFER_LOC <<<"$OFFER"
 echo "  ✓ Picked offer $OFFER_ID — \$$OFFER_HR/hr | reliab=$OFFER_REL | cuda_max=$OFFER_CUDA | $OFFER_LOC"
 
 # ── Rent ──
+# NGC pytorch:25.03+ entrypoint does not honor Vast's SSH-key injection, so
+# `vastai attach ssh` succeeds at the control plane but /root/.ssh/authorized_keys
+# is never written and SSH rejects every key. Fix: pass --onstart-cmd that runs
+# AFTER the entrypoint, writes our local pubkey, and bounces sshd. Pass the key
+# via env (-e ...) and dereference inside the onstart so we never inline the key
+# into a command line that quoting could mangle.
 echo
 echo "▶ Renting offer $OFFER_ID..."
+PUBKEY="$(cat ~/.ssh/id_ed25519.pub 2>/dev/null || true)"
+if [[ -z "$PUBKEY" ]]; then
+  echo "  ✗ ~/.ssh/id_ed25519.pub missing — generate one (ssh-keygen -t ed25519) and re-run."
+  exit 1
+fi
+# base64-encode the pubkey: Vast's --env / --onstart-cmd are space-split by the
+# CLI, so any literal spaces inside the key (between algo, blob, and comment)
+# would corrupt parsing. b64 → one token, no quoting headaches.
+PUBKEY_B64=$(printf '%s' "$PUBKEY" | base64 | tr -d '\n ')
+ONSTART_CMD="mkdir -p /root/.ssh && echo $PUBKEY_B64 | base64 -d > /root/.ssh/authorized_keys && chmod 700 /root/.ssh && chmod 600 /root/.ssh/authorized_keys && (service ssh restart 2>/dev/null || /etc/init.d/ssh restart 2>/dev/null || true)"
 CREATE_OUT=$(vastai create instance "$OFFER_ID" \
-  --image "$IMAGE" --disk "$DISK" --ssh --direct --label "$LABEL" 2>&1)
+  --image "$IMAGE" --disk "$DISK" --ssh --direct --label "$LABEL" \
+  --onstart-cmd "$ONSTART_CMD" 2>&1)
 # vastai prints a Python dict repr (single quotes), not JSON. Match either.
 INSTANCE_ID=$(echo "$CREATE_OUT" | python3 -c "
 import sys, re

@@ -1,10 +1,11 @@
 """
 Unified evaluation script for base models.
 
-Supports three evaluation modes (comma-separated):
+Supports evaluation modes (comma-separated):
   --eval core    : CORE metric (accuracy on ICL tasks)
   --eval bpb     : Bits per byte on train/val splits
   --eval sample  : Generate samples from the model
+  --eval mm_bpb  : Multimodal synthetic-fusion BPB with modality splits
 
 Default is all three: --eval core,bpb,sample
 
@@ -35,8 +36,12 @@ from core.common import compute_init, compute_cleanup, print0, get_base_dir, aut
 from core.tokenizer import HuggingFaceTokenizer, get_token_bytes
 from core.checkpoint_manager import load_model
 from core.core_eval import evaluate_task
-from core.dataloader import tokenizing_distributed_data_loader_bos_bestfit
-from core.loss_eval import evaluate_bpb
+from core.dataloader import (
+    tokenizing_distributed_data_loader_bos_bestfit,
+    tokenizing_distributed_data_loader_with_state_bos_bestfit,
+    synthetic_multimodal_loader,
+)
+from core.loss_eval import evaluate_bpb, evaluate_multimodal_bpb
 from core.engine import Engine
 
 # -----------------------------------------------------------------------------
@@ -177,7 +182,7 @@ def evaluate_core(model, tokenizer, device, max_per_task=-1):
 
 def main():
     parser = argparse.ArgumentParser(description="Base model evaluation")
-    parser.add_argument('--eval', type=str, default='core,bpb,sample', help='Comma-separated evaluations to run: core,bpb,sample (default: all)')
+    parser.add_argument('--eval', type=str, default='core,bpb,sample', help='Comma-separated evaluations to run: core,bpb,sample,mm_bpb (default: core,bpb,sample)')
     parser.add_argument('--hf-path', type=str, default=None, help='HuggingFace model path (e.g. openai-community/gpt2-xl)')
     parser.add_argument('--model-tag', type=str, default=None, help='nanochat model tag to identify the checkpoint directory')
     parser.add_argument('--step', type=int, default=None, help='Model step to load (default = last)')
@@ -185,11 +190,12 @@ def main():
     parser.add_argument('--device-batch-size', type=int, default=32, help='Per-device batch size for BPB evaluation')
     parser.add_argument('--split-tokens', type=int, default=40*524288, help='Number of tokens to evaluate per split for BPB')
     parser.add_argument('--device-type', type=str, default='', help='cuda|cpu|mps (empty = autodetect)')
+    parser.add_argument('--mix-ratio', type=float, default=0.3, help='Target token-level vision/text mix ratio for mm_bpb')
     args = parser.parse_args()
 
     # Parse evaluation modes
     eval_modes = set(mode.strip() for mode in args.eval.split(','))
-    valid_modes = {'core', 'bpb', 'sample'}
+    valid_modes = {'core', 'bpb', 'sample', 'mm_bpb'}
     invalid = eval_modes - valid_modes
     if invalid:
         parser.error(f"Invalid eval modes: {invalid}. Valid: {valid_modes}")
@@ -199,6 +205,7 @@ def main():
     ddp, ddp_rank, ddp_local_rank, ddp_world_size, device = compute_init(device_type)
     # Load model and tokenizer
     is_hf_model = args.hf_path is not None
+    meta = None
     if is_hf_model:
         model, tokenizer = load_hf_model(args.hf_path, device)
         sequence_len = model.max_seq_len or 1024
@@ -218,6 +225,7 @@ def main():
     # Results to log
     core_results = None
     bpb_results = {}
+    mm_bpb_results = {}
     samples = []
     unconditioned_samples = []
 
@@ -275,6 +283,46 @@ def main():
             bpb_results[split_name] = bpb
             print0(f"{split_name} bpb: {bpb:.6f}")
 
+    # --- Multimodal BPB evaluation ---
+    if 'mm_bpb' in eval_modes:
+        if is_hf_model:
+            print0("\nSkipping mm_bpb for HuggingFace models (nanochat multimodal path required)")
+        else:
+            print0("\n" + "="*80)
+            print0("Multimodal BPB Evaluation")
+            print0("="*80)
+            model_config = meta.get("model_config", {})
+            if not model_config.get("multimodal", False):
+                print0("Skipping mm_bpb: checkpoint was not built with multimodal=True")
+            else:
+                tokens_per_step = args.device_batch_size * sequence_len * ddp_world_size
+                if args.split_tokens % tokens_per_step != 0:
+                    args.split_tokens = (args.split_tokens // tokens_per_step) * tokens_per_step
+                    print0(f"Adjusted split_tokens to {args.split_tokens} (must be divisible by {tokens_per_step})")
+                steps = args.split_tokens // tokens_per_step
+                image_pad_token_id = model_config["image_pad_token_id"]
+                spatial_merge_size = model_config.get("vision_spatial_merge_size", 2)
+                for split_name in ["train", "val"]:
+                    text_loader = tokenizing_distributed_data_loader_with_state_bos_bestfit(
+                        tokenizer, args.device_batch_size, sequence_len, split_name, device=device,
+                    )
+                    loader = synthetic_multimodal_loader(
+                        text_loader,
+                        mix_ratio=args.mix_ratio,
+                        spatial_merge_size=spatial_merge_size,
+                        image_pad_token_id=image_pad_token_id,
+                        device=device,
+                        seed=10 if split_name == "train" else 11,
+                    )
+                    split_results = evaluate_multimodal_bpb(model, loader, steps, token_bytes)
+                    mm_bpb_results[split_name] = split_results
+                    print0(
+                        f"{split_name} mm_bpb: {split_results['bpb']:.6f} "
+                        f"| text: {split_results['bpb_text']:.6f} "
+                        f"| vision_ctx: {split_results['bpb_vision']:.6f} "
+                        f"| r_actual: {split_results['r_actual']:.3f}"
+                    )
+
     # --- CORE evaluation ---
     if 'core' in eval_modes:
         print0("\n" + "="*80)
@@ -308,6 +356,11 @@ def main():
     if bpb_results:
         report_data[0]["train bpb"] = bpb_results.get("train")
         report_data[0]["val bpb"] = bpb_results.get("val")
+
+    if mm_bpb_results:
+        report_data[0]["train mm_bpb"] = mm_bpb_results.get("train", {}).get("bpb")
+        report_data[0]["val mm_bpb"] = mm_bpb_results.get("val", {}).get("bpb")
+        report_data.append({f"mm_bpb/{split}": values for split, values in mm_bpb_results.items()})
 
     if samples:
         report_data.append({f"sample {i}": s for i, s in enumerate(samples)})

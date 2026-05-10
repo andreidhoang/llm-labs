@@ -29,7 +29,7 @@ from core.dataloader import tokenizing_distributed_data_loader_bos_bestfit, toke
 from core.common import compute_init, compute_cleanup, print0, DummyWandb, print_banner, get_base_dir, autodetect_device_type, get_peak_flops, COMPUTE_DTYPE, COMPUTE_DTYPE_REASON, is_ddp_initialized
 from core.tokenizer import get_tokenizer, get_token_bytes
 from core.checkpoint_manager import save_checkpoint, load_checkpoint
-from core.loss_eval import evaluate_bpb
+from core.loss_eval import evaluate_bpb, evaluate_multimodal_bpb
 from core.engine import Engine
 from core.flash_attention import HAS_FA3
 from scripts.base_eval import evaluate_core
@@ -65,7 +65,12 @@ parser.add_argument("--mix-ratio", type=float, default=0.3, help="target token-l
 parser.add_argument("--siglip-model-id", type=str, default="google/siglip2-so400m-patch14-384", help="HF model ID for vision encoder")
 parser.add_argument("--vision-spatial-merge-size", type=int, default=2, help="2x2 spatial merge in PatchMerger")
 parser.add_argument("--vision-embed-dim", type=int, default=1152, help="SigLIP2 hidden size (only used as a check; actual value read from loaded model)")
-parser.add_argument("--freeze-vision-merger", action="store_true", default=True, help="freeze PatchMerger after warmup (per multimodal_spec.md decision #3)")
+parser.add_argument(
+    "--freeze-vision-merger",
+    action=argparse.BooleanOptionalAction,
+    default=False,
+    help="freeze PatchMerger after initialization; default trains the connector because it is randomly initialized",
+)
 # Training horizon (only one used, in order of precedence)
 parser.add_argument("--num-iterations", type=int, default=-1, help="explicit number of optimization steps (-1 = disable)")
 parser.add_argument("--target-flops", type=float, default=-1.0, help="calculate num_iterations to reach target_flops (-1 = disable)")
@@ -147,6 +152,7 @@ def build_model_meta(depth):
     base_dim = depth * args.aspect_ratio
     model_dim = ((base_dim + args.head_dim - 1) // args.head_dim) * args.head_dim
     num_heads = model_dim // args.head_dim
+    image_pad_token_id = vocab_size - 1 if args.multimodal else -1
     config = GPTConfig(
         sequence_len=args.max_seq_len, vocab_size=vocab_size,
         n_layer=depth, n_head=num_heads, n_kv_head=num_heads, n_embd=model_dim,
@@ -156,6 +162,7 @@ def build_model_meta(depth):
         vision_embed_dim=args.vision_embed_dim,
         vision_spatial_merge_size=args.vision_spatial_merge_size,
         siglip_model_id=args.siglip_model_id,
+        image_pad_token_id=image_pad_token_id,
         freeze_vision_merger=args.freeze_vision_merger,
     )
     with torch.device("meta"):
@@ -370,14 +377,27 @@ build_val_loader = lambda: tokenizing_distributed_data_loader_bos_bestfit(tokeni
 # For Track B' synthetic mode we use vocab_size-1 as the placeholder. Real
 # integration with LAION-Recap data will use a tokenizer-defined special token.
 if args.multimodal:
-    image_pad_token_id = vocab_size - 1
+    image_pad_token_id = model_config.image_pad_token_id
     train_loader = synthetic_multimodal_loader(
         train_loader,
         mix_ratio=args.mix_ratio,
+        spatial_merge_size=args.vision_spatial_merge_size,
         image_pad_token_id=image_pad_token_id,
         device=device,
         seed=0,
     )
+    def build_val_loader():
+        val_text_loader = tokenizing_distributed_data_loader_with_state_bos_bestfit(
+            tokenizer, args.device_batch_size, args.max_seq_len, split="val", device=device,
+        )
+        return synthetic_multimodal_loader(
+            val_text_loader,
+            mix_ratio=args.mix_ratio,
+            spatial_merge_size=args.vision_spatial_merge_size,
+            image_pad_token_id=image_pad_token_id,
+            device=device,
+            seed=1,
+        )
     print0(f"Multimodal training enabled: mix_ratio={args.mix_ratio}, image_pad_token_id={image_pad_token_id}")
 _first = next(train_loader) # kick off load of the very first batch of data
 # Multimodal-aware unpacking: dataloader returns (x, y, state) for text-only,
@@ -480,16 +500,38 @@ while True:
         val_loader = build_val_loader()
         eval_steps = args.eval_tokens // (args.device_batch_size * args.max_seq_len * ddp_world_size)
         with disable_fp8(model):
-            val_bpb = evaluate_bpb(model, val_loader, eval_steps, token_bytes)
-        print0(f"Step {step:05d} | Validation bpb: {val_bpb:.6f}")
+            if args.multimodal:
+                val_mm = evaluate_multimodal_bpb(model, val_loader, eval_steps, token_bytes)
+                val_bpb = val_mm["bpb"]
+            else:
+                val_mm = None
+                val_bpb = evaluate_bpb(model, val_loader, eval_steps, token_bytes)
+        if val_mm is not None:
+            print0(
+                f"Step {step:05d} | Validation mm_bpb: {val_bpb:.6f} "
+                f"| text: {val_mm['bpb_text']:.6f} | vision_ctx: {val_mm['bpb_vision']:.6f} "
+                f"| r_actual: {val_mm['r_actual']:.3f}"
+            )
+        else:
+            print0(f"Step {step:05d} | Validation bpb: {val_bpb:.6f}")
         if val_bpb < min_val_bpb:
             min_val_bpb = val_bpb
-        wandb_run.log({
+        val_log_data = {
             "step": step,
             "total_training_flops": flops_so_far,
             "total_training_time": total_training_time,
             "val/bpb": val_bpb,
-        })
+        }
+        if val_mm is not None:
+            val_log_data.update({
+                "val/mm_bpb": val_mm["bpb"],
+                "val/mm_bpb_text": val_mm["bpb_text"],
+                "val/mm_bpb_vision": val_mm["bpb_vision"],
+                "val/mm_n_text": val_mm["n_text"],
+                "val/mm_n_vision": val_mm["n_vision"],
+                "val/mm_r_actual": val_mm["r_actual"],
+            })
+        wandb_run.log(val_log_data)
         model.train()
 
     # once in a while: estimate the CORE metric (all ranks participate)
@@ -603,6 +645,10 @@ while True:
         if group['kind'] == 'muon':
             group["momentum"] = muon_momentum
             group["weight_decay"] = muon_weight_decay
+    # MoE auxiliary-loss-free load balancing: log current routing usage, then
+    # update/reset the router bias before applying the weight update.
+    moe_stats = model.get_moe_stats()
+    model.update_moe_balancing()
     if scaler is not None:
         scaler.unscale_(optimizer)
         # In distributed training, all ranks must agree on whether to skip the step.
@@ -655,6 +701,7 @@ while True:
             "train/mfu": mfu,
             "train/epoch": epoch,
         }
+        log_data.update(moe_stats)
         # Multimodal: per-modality loss decomposition (only logged when multimodal cells contributed)
         if args.multimodal:
             n_text_total = mm_n_text.item()

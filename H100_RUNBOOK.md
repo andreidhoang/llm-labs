@@ -1,7 +1,8 @@
-# H100 Bench Runbook — wallclock-port
+# H100 Training Runbook — Vast.ai H100
 
-One-page operator's guide for running the 5-phase wallclock-port battery on
-2×H100 (or 8×H100) via Vast.ai.
+Operator guide for H100 MoE/multimodal training and benchmarking on Vast.ai.
+The most important rule: use an NGC PyTorch image with `torch._grouped_mm`.
+Without it, `core/moe.py` falls back to a correct but much slower per-expert loop.
 
 ## Prerequisites (one-time, on local Mac)
 
@@ -20,6 +21,53 @@ export GH_TOKEN=<redacted-github-token>
 export WANDB_API_KEY=xxx
 ```
 
+## Required PyTorch Image
+
+Use this image by default:
+
+```bash
+export IMAGE=nvcr.io/nvidia/pytorch:25.03-py3
+```
+
+Why `25.03-py3`:
+- Our 2×H100 smoke on `nvcr.io/nvidia/pytorch:25.01-py3` showed `torch=2.6.0a0` and `torch._grouped_mm=False`.
+- NVIDIA's 25.03 PyTorch container release notes list CUDA `12.8.1` and PyTorch `2.7.0a0`.
+- The same release notes list driver release `570+` for CUDA `12.8.1`, which matches common Vast H100 hosts.
+- NVIDIA's 25.04 image also uses PyTorch `2.7.0a0`, but moves to CUDA `12.9`; many cheap Vast H100 offers advertise `cuda_max_good=12.8`, so `25.03` is the safer default.
+
+When selecting offers, require:
+
+```bash
+vastai search offers \
+  'num_gpus=2 gpu_name in [H100_SXM,H100_PCIE,H100_NVL] reliability>0.95 verified=true cuda_max_good>=12.8' \
+  -o 'dph_total' --raw
+```
+
+For 8 GPUs:
+
+```bash
+vastai search offers \
+  'num_gpus=8 gpu_name in [H100_SXM,H100_PCIE,H100_NVL] reliability>0.95 verified=true cuda_max_good>=12.8' \
+  -o 'reliability-,dph_total' --raw
+```
+
+Immediately after SSH, verify the kernel:
+
+```bash
+python - <<'PY'
+import torch
+print("torch", torch.__version__, "cuda", torch.version.cuda)
+print("private _grouped_mm:", hasattr(torch, "_grouped_mm"))
+print("public grouped_mm:", hasattr(torch.nn.functional, "grouped_mm"))
+assert hasattr(torch, "_grouped_mm"), "wrong image: MoE will use slow fallback"
+PY
+```
+
+`torch.nn.functional.grouped_mm` is the newer public API documented by PyTorch,
+but this repo currently calls the private `torch._grouped_mm` path. Treat public
+`grouped_mm` without private `_grouped_mm` as a code-port task, not as a green
+light for performance training.
+
 ## Run the bench (one command)
 
 ```bash
@@ -28,10 +76,10 @@ bash scripts/run_h100_bench.sh
 ```
 
 That's it. The orchestrator does:
-1. Search cheapest 2×H100 SXM offer on Vast (verified, reliability >0.95)
-2. Rent with `nvcr.io/nvidia/pytorch:25.01-py3` image (NGC, includes FA3 + gcc + torch 2.6 + `_grouped_mm`)
+1. Search cheapest H100 offer on Vast (verified, reliability >0.95, `cuda_max_good>=12.8`)
+2. Rent with `nvcr.io/nvidia/pytorch:25.03-py3` image (NGC, PyTorch 2.7, CUDA 12.8)
 3. Wait for `actual_status=running` (~2-5 min image pull)
-4. SCP `provision_h100.sh` → run it (idempotent, ~30s: verify FA3, install missing pip deps, wandb login)
+4. SCP `provision_h100.sh` → run it (idempotent, ~30s: verify FA3 and `_grouped_mm`, install missing pip deps, wandb login)
 5. Pull repo `wallclock-port` branch via GitHub API tarball
 6. Run `bench_run_all.sh` 5-phase battery (~15-25 min compute):
    - `phase_0_baseline` — no wallclock optimizations
@@ -49,6 +97,9 @@ That's it. The orchestrator does:
 ## Customizing
 
 ```bash
+# Recommended default image for MoE performance
+IMAGE=nvcr.io/nvidia/pytorch:25.03-py3 bash scripts/run_h100_bench.sh
+
 # 8×H100 production scale
 GPUS=8 DEPTH=20 DBS=16 SEQ=2048 bash scripts/run_h100_bench.sh
 
@@ -63,7 +114,21 @@ BRANCH=my-branch bash scripts/run_h100_bench.sh
 
 # Skip wandb
 WANDB_API_KEY="" bash scripts/run_h100_bench.sh
+
+# Correctness-only smoke on an older image; do not use for perf numbers
+ALLOW_GROUPED_MM_FALLBACK=1 IMAGE=nvcr.io/nvidia/pytorch:25.01-py3 bash scripts/run_h100_bench.sh
 ```
+
+## Training Gate
+
+Before spending on an 8×H100 run:
+- Run `scripts/provision_h100.sh` and confirm `has _grouped_mm=True`.
+- Run a 2×H100 distributed smoke for 3-10 optimizer steps.
+- Run 8×H100 for 50-200 steps with `--compile-fullgraph` off first.
+- Only then enable compile/FP8/activation checkpointing one at a time.
+
+Do not accept performance numbers from a run that prints `has _grouped_mm=False`.
+Those numbers measure Python/per-expert fallback overhead, not the intended MoE kernel path.
 
 ## Watching it live
 
@@ -104,6 +169,7 @@ python -m scripts.bench_compare \
 | `vastai search` returns 0 offers | H100 marketplace dry | Wait an hour; or check `vastai search offers 'gpu_name=H100_NVL num_gpus=2'` |
 | Image pull >15 min | First-pull on this Vast machine | Just wait; subsequent rents on same machine cache it |
 | `--require-fa3` fails | Wrong image (FA3 missing) | Verify `IMAGE` includes FA3 (NGC ≥24.10 does); else build from source |
+| `has _grouped_mm=False` | Image is too old or PyTorch build lacks grouped GEMM | Use `IMAGE=nvcr.io/nvidia/pytorch:25.03-py3` and require `cuda_max_good>=12.8`; for smoke only set `ALLOW_GROUPED_MM_FALLBACK=1` |
 | Wandb auth fails | Bad / expired key | `vastai destroy`, get fresh key from wandb.ai/authorize, re-run |
 | GitHub auth (404) | PAT wrong scope or expired | Need `repo` scope on classic PAT, or `Contents:read` on fine-grained |
 | Phase 4 (FP8) crashes | Float8Linear vs torch 2.6 issue | Re-run with `--fp8` removed: `IMAGE=... bash run_h100_bench.sh` (and remove phase_4 from bench_run_all.sh temporarily) |
