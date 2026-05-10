@@ -1,9 +1,10 @@
-# torch 2.6+ required for torch._grouped_mm (used by core/moe.py).
-# NGC image nvcr.io/nvidia/pytorch:25.01-py3 ships torch 2.6.0a0 — compatible.
-# For local CPU dev / testing, any torch >= 2.6 works.
-torch>=2.6.0,<2.8
+# torch 2.7+ recommended for torch._grouped_mm (used by core/moe.py).
+# NGC image nvcr.io/nvidia/pytorch:25.03-py3 ships torch 2.7.0a0 + CUDA 12.8.
+# 25.01 ships torch 2.6.0a0 and has been observed to lack torch._grouped_mm.
+# For local CPU dev / testing, torch >= 2.7 keeps behavior closest to H100 runs.
+torch>=2.7.0,<2.9
 # flash-attn 3 (Hopper-only, sm_90+) is REQUIRED for production bench but provided
-# by the NGC pytorch:25.01-py3 image (DO NOT pip install on a runtime image — needs nvcc).
+# by the NGC pytorch images (DO NOT pip install on a runtime image — needs nvcc).
 # flash-attn>=3.0.0b1  # uncomment ONLY when using a devel image with nvcc
 numpy
 pandas

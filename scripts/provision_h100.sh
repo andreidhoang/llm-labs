@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Idempotent provisioning for a fresh NVIDIA NGC PyTorch container on Vast.ai.
 #
-# Image assumed: nvcr.io/nvidia/pytorch:25.01-py3 or newer
-#   (PyTorch 2.6+, CUDA 12.6+, FA3, gcc/g++, NCCL, cuDNN, Triton — all included)
+# Image assumed: nvcr.io/nvidia/pytorch:25.03-py3 or newer
+#   (PyTorch 2.7+, CUDA 12.8+, FA3, gcc/g++, NCCL, cuDNN, Triton — all included)
 #
 # What this adds on top of NGC:
 #   - missing pip deps (wandb, einx, etc.)
@@ -16,6 +16,7 @@
 # Env vars (all optional except WANDB_API_KEY when wandb is wanted):
 #   WANDB_API_KEY    paste from https://wandb.ai/authorize → wandb login (skipped if empty)
 #   EXTRA_PIP        space-separated extra pip packages
+#   ALLOW_GROUPED_MM_FALLBACK=1  allow correctness-only MoE smoke without torch._grouped_mm
 
 set -euo pipefail
 
@@ -66,9 +67,25 @@ v = torch.__version__
 cv = torch.version.cuda
 nvers = '.'.join(str(x) for x in torch.cuda.nccl.version()) if torch.cuda.is_available() else 'N/A'
 print(f'  torch={v} cuda={cv} nccl={nvers} n_gpu={torch.cuda.device_count()}')
-print(f'  has _grouped_mm={hasattr(torch, \"_grouped_mm\")}')
+has_private = hasattr(torch, '_grouped_mm')
+has_public = hasattr(torch.nn.functional, 'grouped_mm')
+print(f'  has _grouped_mm={has_private}')
+print(f'  has torch.nn.functional.grouped_mm={has_public}')
 assert torch.cuda.is_available(), 'CUDA not available'
 "
+
+if [[ "${ALLOW_GROUPED_MM_FALLBACK:-0}" != "1" ]]; then
+  python -c "
+import torch
+assert hasattr(torch, '_grouped_mm'), (
+    'torch._grouped_mm missing. This repo will fall back to a slow per-expert loop. '
+    'Use nvcr.io/nvidia/pytorch:25.03-py3 or newer, and verify Vast cuda_max_good>=12.8. '
+    'For correctness-only smoke tests, rerun provisioning with ALLOW_GROUPED_MM_FALLBACK=1.'
+)
+"
+else
+  echo "  ⚠ ALLOW_GROUPED_MM_FALLBACK=1: MoE grouped-MM performance gate disabled"
+fi
 
 # ── Verify FlashAttention ──
 echo
@@ -82,7 +99,7 @@ try:
     print(f'  GPU capability: sm_{cap[0]}{cap[1]} {\"(Hopper, FA3 OK)\" if cap[0]>=9 else \"(non-Hopper, SDPA fallback only)\"}')
 except ImportError:
     print('  ⚠ flash_attn NOT installed — would need source build (slow on runtime image)')
-    print('  → If this image lacks FA3, switch to nvcr.io/nvidia/pytorch:25.01-py3')
+    print('  → If this image lacks FA3, switch to nvcr.io/nvidia/pytorch:25.03-py3')
 "
 
 # ── Install missing pip deps ──

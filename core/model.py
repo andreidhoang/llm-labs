@@ -16,6 +16,7 @@ from functools import partial
 from dataclasses import dataclass
 
 import torch
+import torch.distributed as dist
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -56,7 +57,7 @@ class GPTConfig:
     vision_spatial_merge_size: int = 2
     siglip_model_id: str = "google/siglip2-so400m-patch14-384"
     image_pad_token_id: int = -1          # set by tokenizer at runtime when multimodal=True
-    freeze_vision_merger: bool = True
+    freeze_vision_merger: bool = False
 
 
 def norm(x):
@@ -351,7 +352,17 @@ class GPT(nn.Module):
         - Chinchilla counts the embedding layer as flops (? weird, it's just a lookup => we ignore)
         - Chinchilla counts exp/sum/divide in attention softmax as flops (a little sus and very tiny => we ignore)
         """
-        nparams = sum(p.numel() for p in self.parameters())
+        # Keep this estimate scoped to the autoregressive trunk. Frozen vision
+        # towers are real memory/latency, but they do not follow the LM
+        # "6 * trainable matmul params per token" scaling-law approximation.
+        nparams = (
+            self.transformer.wte.weight.numel()
+            + sum(ve.weight.numel() for ve in self.value_embeds.values())
+            + self.lm_head.weight.numel()
+            + sum(p.numel() for p in self.transformer.h.parameters())
+            + self.resid_lambdas.numel()
+            + self.x0_lambdas.numel()
+        )
         # Exclude non-matmul params: embeddings and per-layer scalars
         value_embeds_numel = sum(ve.weight.numel() for ve in self.value_embeds.values())
         nparams_exclude = (self.transformer.wte.weight.numel() + value_embeds_numel +
@@ -394,7 +405,12 @@ class GPT(nn.Module):
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
         scalars = self.resid_lambdas.numel() + self.x0_lambdas.numel()
-        total = wte + value_embeds + lm_head + transformer_matrices + scalars
+        trunk_total = wte + value_embeds + lm_head + transformer_matrices + scalars
+        vision_total = sum(p.numel() for p in self.vision_tower.parameters()) if self.vision_tower is not None else 0
+        vision_trainable = sum(p.numel() for p in self.vision_tower.parameters() if p.requires_grad) if self.vision_tower is not None else 0
+        vision_frozen = vision_total - vision_trainable
+        total = trunk_total + vision_total
+        trainable_total = sum(p.numel() for p in self.parameters() if p.requires_grad)
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
         # MoE: only top_k/num_experts fraction of routed expert params active per token
         # Shared expert is always active so its params stay in the active count
@@ -403,7 +419,12 @@ class GPT(nn.Module):
         inactive_per_layer = routed_params_per_layer * (self.config.num_experts - self.config.top_k) // self.config.num_experts
         moe_inactive = inactive_per_layer * self.config.n_layer
         active_transformer_matrices = transformer_matrices - moe_inactive
-        active_total = total - moe_inactive
+        active_trunk_total = trunk_total - moe_inactive
+        # Active params follow DeepSeek-style MoE reporting for the LLM trunk,
+        # plus the full vision tower as context. Trainable-active excludes
+        # frozen SigLIP/PatchMerger params for optimizer/memory accounting.
+        active_total = active_trunk_total + vision_total
+        trainable_active_total = active_trunk_total + vision_trainable
         return {
             'wte': wte,
             'value_embeds': value_embeds,
@@ -412,6 +433,13 @@ class GPT(nn.Module):
             'active_transformer_matrices': active_transformer_matrices,
             'scalars': scalars,
             'moe_inactive': moe_inactive,
+            'trunk_total': trunk_total,
+            'active_trunk_total': active_trunk_total,
+            'vision_total': vision_total,
+            'vision_trainable': vision_trainable,
+            'vision_frozen': vision_frozen,
+            'trainable_total': trainable_total,
+            'trainable_active_total': trainable_active_total,
             'total': total,
             'active_total': active_total,
         }
@@ -421,13 +449,22 @@ class GPT(nn.Module):
         ddp, rank, local_rank, world_size = get_dist_info()
 
         # Separate out all parameters into groups
-        matrix_params = list(self.transformer.h.parameters())
-        value_embeds_params = list(self.value_embeds.parameters())
-        embedding_params = list(self.transformer.wte.parameters())
-        lm_head_params = list(self.lm_head.parameters())
+        matrix_params = [p for p in self.transformer.h.parameters() if p.requires_grad]
+        value_embeds_params = [p for p in self.value_embeds.parameters() if p.requires_grad]
+        embedding_params = [p for p in self.transformer.wte.parameters() if p.requires_grad]
+        lm_head_params = [p for p in self.lm_head.parameters() if p.requires_grad]
+        vision_params = []
+        if self.vision_tower is not None:
+            vision_params = [p for p in self.vision_tower.parameters() if p.requires_grad]
         resid_params = [self.resid_lambdas]
         x0_params = [self.x0_lambdas]
-        assert len(list(self.parameters())) == len(matrix_params) + len(embedding_params) + len(lm_head_params) + len(value_embeds_params) + len(resid_params) + len(x0_params)
+        grouped_params = (
+            matrix_params + embedding_params + lm_head_params + value_embeds_params +
+            vision_params + resid_params + x0_params
+        )
+        trainable_params = [p for p in self.parameters() if p.requires_grad]
+        assert len({id(p) for p in grouped_params}) == len(grouped_params), "Optimizer parameter groups overlap"
+        assert len(trainable_params) == len(grouped_params), "Some trainable parameters are missing from optimizer groups"
 
         # Scale the LR for the AdamW parameters by ∝1/√dmodel (tuned for 768 dim model)
         dmodel_lr_scale = (model_dim / 768) ** -0.5
@@ -442,6 +479,10 @@ class GPT(nn.Module):
             dict(kind='adamw', params=resid_params, lr=scalar_lr * 0.01, betas=adam_betas, eps=1e-10, weight_decay=0.0),
             dict(kind='adamw', params=x0_params, lr=scalar_lr, betas=(0.96, 0.95), eps=1e-10, weight_decay=0.0),  # higher beta1 for x0
         ]
+        if vision_params:
+            # PatchMerger warmup, if enabled, is small and bias-bearing; keep it on AdamW
+            # instead of Muon, whose matrix assumptions are tuned for the LLM trunk.
+            param_groups.append(dict(kind='adamw', params=vision_params, lr=matrix_lr * dmodel_lr_scale, betas=adam_betas, eps=1e-10, weight_decay=0.0))
         # Muon groups (matrix params, grouped by shape for stacking)
         for shape in sorted({p.shape for p in matrix_params}):
             group_params = [p for p in matrix_params if p.shape == shape]
@@ -471,6 +512,9 @@ class GPT(nn.Module):
             all_biases.append(router.expert_bias)
         counts = torch.stack(all_counts).float()    # (n_layer, num_experts)
         biases = torch.stack(all_biases).float()    # (n_layer, num_experts)
+        if dist.is_initialized():
+            counts = counts.clone()
+            dist.all_reduce(counts, op=dist.ReduceOp.SUM)
         # Load imbalance: coefficient of variation (std/mean) per layer, averaged
         counts_mean = counts.mean(dim=-1).clamp(min=1)
         counts_std = counts.std(dim=-1)
