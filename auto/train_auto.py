@@ -73,7 +73,7 @@ HEAD_DIM = 128
 NUM_EXPERTS = 1                     # MoE: routed experts
 TOP_K = 1                           # MoE: experts active per token (routed)
 NUM_SHARED_EXPERTS = 0              # MoE: always-active expert
-WINDOW_PATTERN = "L"                # "L" = full causal every layer
+WINDOW_PATTERN = "SSSL"                # "L" = full causal every layer
 
 # --- Optimizer LRs (passed to model.setup_optimizer) ---
 EMBEDDING_LR = 0.6
