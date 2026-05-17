@@ -68,7 +68,7 @@ from prepare_auto import (  # noqa: E402
 
 # --- Architecture (consumed below to build GPTConfig) ---
 DEPTH = 8
-ASPECT_RATIO = 64                   # n_embd = DEPTH * ASPECT_RATIO * 4
+ASPECT_RATIO = 64                   # n_embd = DEPTH * ASPECT_RATIO
 HEAD_DIM = 128
 NUM_EXPERTS = 4                     # MoE: routed experts
 TOP_K = 2                           # MoE: experts active per token (routed)
