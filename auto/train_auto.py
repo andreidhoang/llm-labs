@@ -78,7 +78,7 @@ WINDOW_PATTERN = "L"                # "L" = full causal every layer
 # --- Optimizer LRs (passed to model.setup_optimizer) ---
 EMBEDDING_LR = 0.3
 UNEMBEDDING_LR = 0.008
-MATRIX_LR = 0.02
+MATRIX_LR = 0.04
 SCALAR_LR = 0.5
 WEIGHT_DECAY = 0.0
 ADAM_BETAS = (0.9, 0.95)
