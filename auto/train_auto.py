@@ -37,15 +37,22 @@ import sys
 import math
 import time
 
+# Ensure both core/ (sibling of auto/) and prepare_auto (in auto/) are importable
+# regardless of CWD or how this script is invoked.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_REPO_ROOT = os.path.dirname(_HERE)
+for p in (_REPO_ROOT, _HERE):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 import torch
 
 # core/ is the source of truth. Importing from it (rather than duplicating it)
 # means agent findings flow back into the production codebase naturally.
-from core.model import GPT, GPTConfig
-from core.common import COMPUTE_DTYPE
+from core.model import GPT, GPTConfig  # noqa: E402
+from core.common import COMPUTE_DTYPE  # noqa: E402
 
 # auto/prepare_auto.py is the FROZEN scaffold (vocab, eval, dataloader).
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from prepare_auto import (  # noqa: E402
     load_tokenizer,
     make_dataloader,
@@ -131,9 +138,11 @@ def main():
     assert vocab_size == VOCAB_SIZE, f"tokenizer vocab {vocab_size} != prepare_auto VOCAB_SIZE {VOCAB_SIZE}"
 
     # ---------- model ----------
-    # Aspect-ratio-driven sizing: n_embd = DEPTH * ASPECT_RATIO * 4 keeps the
-    # width-to-depth ratio sane across the depth=[4,12] envelope.
-    n_embd = DEPTH * ASPECT_RATIO * 4
+    # Aspect-ratio-driven sizing: n_embd = DEPTH * ASPECT_RATIO. With Karpathy's
+    # defaults (DEPTH=8, ASPECT_RATIO=64) this gives n_embd=512, ~50M total
+    # params — matching Karpathy's published autoresearch d=8 baseline so
+    # val_bpb numbers are directly comparable.
+    n_embd = DEPTH * ASPECT_RATIO
     n_head = max(1, n_embd // HEAD_DIM)
     cfg = GPTConfig(
         sequence_len=MAX_SEQ_LEN,

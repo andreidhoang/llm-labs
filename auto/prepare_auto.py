@@ -26,6 +26,12 @@ import time
 import pickle
 from multiprocessing import Pool
 
+# Ensure `from core.X import Y` works regardless of invocation directory:
+# add the repo root (parent of auto/) to sys.path before importing core.
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
+
 import torch
 
 # Imports from core/ are allowed here because this file is FROZEN.
