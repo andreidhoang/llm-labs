@@ -1,0 +1,9 @@
+commit	val_bpb	memory_gb	status	description
+268c046	1.120724	20.6	keep	baseline: MoE-on default (NUM_EXPERTS=4 TOP_K=2 SHARED=1 d=8 n_embd=512)
+412bb36	1.084925	76.6	keep	[bears on H_4] anchor: dense (NUM_EXPERTS=1) + Karpathy HPs (EMBED=0.6 MATRIX=0.04 WD=0.2 WARMUP=0). val_bpb 0.087 above Karpathy 0.998; gap is FA2 throughput (50M params match exactly)
+87646be	1.081073	76.6	keep	anchor v2: + WINDOW_PATTERN=SSSL. Marginal -0.004 vs full-causal; sliding window not load-bearing at d=8 with FA2
+3507121	0.000000	0.0	session-marker	revert to MoE-on baseline (session reset for iteration)
+2ee3a83	1.109074	20.6	keep	iter1: MATRIX_LR 0.02 -> 0.04 (-0.012 vs baseline)
+aed3670	1.105286	20.6	keep	iter2: + EMBEDDING_LR 0.3 -> 0.6 (-0.004 vs iter1)
+5d7fb4a	1.142020	20.9	discard	iter3: NUM_EXPERTS 4 -> 8 (+0.037 vs iter2; throughput regression) [bears on H_4]
+ebbce69	1.062571	19.7	keep	iter4: dense (NUM_EXPERTS=1) at iter2 HPs (-0.043 vs iter2; +52% tokens/step) [bears on H_4 STRONG]
