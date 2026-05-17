@@ -70,26 +70,26 @@ from prepare_auto import (  # noqa: E402
 DEPTH = 8
 ASPECT_RATIO = 64                   # n_embd = DEPTH * ASPECT_RATIO
 HEAD_DIM = 128
-NUM_EXPERTS = 4                     # MoE: routed experts
-TOP_K = 2                           # MoE: experts active per token (routed)
-NUM_SHARED_EXPERTS = 1              # MoE: always-active expert
+NUM_EXPERTS = 1                     # MoE: routed experts
+TOP_K = 1                           # MoE: experts active per token (routed)
+NUM_SHARED_EXPERTS = 0              # MoE: always-active expert
 WINDOW_PATTERN = "L"                # "L" = full causal every layer
 
 # --- Optimizer LRs (passed to model.setup_optimizer) ---
-EMBEDDING_LR = 0.3
-UNEMBEDDING_LR = 0.008
-MATRIX_LR = 0.02
+EMBEDDING_LR = 0.6
+UNEMBEDDING_LR = 0.004
+MATRIX_LR = 0.04
 SCALAR_LR = 0.5
-WEIGHT_DECAY = 0.0
-ADAM_BETAS = (0.9, 0.95)
+WEIGHT_DECAY = 0.2
+ADAM_BETAS = (0.8, 0.95)
 
 # --- LR schedule shape (used by get_lr_multiplier below) ---
-WARMUP_RATIO = 0.05                 # fraction of TIME_BUDGET spent warming up
-WARMDOWN_RATIO = 0.3                # fraction of TIME_BUDGET spent cooling down to 0
+WARMUP_RATIO = 0.0                 # fraction of TIME_BUDGET spent warming up
+WARMDOWN_RATIO = 0.5                # fraction of TIME_BUDGET spent cooling down to 0
 
 # --- Training shape ---
-DEVICE_BATCH_SIZE = 32
-TOTAL_BATCH_SIZE = 2 ** 18          # tokens per optimizer step
+DEVICE_BATCH_SIZE = 128
+TOTAL_BATCH_SIZE = 2 ** 19          # tokens per optimizer step
 SEED = 1337
 WARMUP_STEPS_TO_IGNORE = 10         # exclude compile + first iters from wall-clock budget
 
