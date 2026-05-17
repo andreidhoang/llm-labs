@@ -70,9 +70,9 @@ from prepare_auto import (  # noqa: E402
 DEPTH = 8
 ASPECT_RATIO = 64                   # n_embd = DEPTH * ASPECT_RATIO
 HEAD_DIM = 128
-NUM_EXPERTS = 4                     # MoE: routed experts
-TOP_K = 2                           # MoE: experts active per token (routed)
-NUM_SHARED_EXPERTS = 1              # MoE: always-active expert
+NUM_EXPERTS = 1                     # MoE: routed experts
+TOP_K = 1                           # MoE: experts active per token (routed)
+NUM_SHARED_EXPERTS = 0              # MoE: always-active expert
 WINDOW_PATTERN = "L"                # "L" = full causal every layer
 
 # --- Optimizer LRs (passed to model.setup_optimizer) ---
