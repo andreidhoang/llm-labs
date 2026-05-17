@@ -1,0 +1,8 @@
+# results.tsv is the per-session run log; the canonical history is the git log
+# of the auto/<tag> branch itself (each commit = one experiment).
+results.tsv
+run.log
+anchor.log
+__pycache__/
+*.pyc
+.cache/
