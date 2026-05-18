@@ -233,18 +233,18 @@ class GPT(nn.Module):
 
         # Transformer blocks: uniform init with bound = sqrt(3) * std (same standard deviation as normal)
         n_embd = self.config.n_embd
-        s = 3**0.5 * n_embd**-0.5 # sqrt(3) multiplier makes sure Uniform achieves the same std as Normal
+        std = n_embd**-0.5  # session 3 iter2: Normal init # sqrt(3) multiplier makes sure Uniform achieves the same std as Normal
         for block in self.transformer.h:
-            torch.nn.init.uniform_(block.attn.c_q.weight, -s, s) # weights use Uniform to avoid outliers
-            torch.nn.init.uniform_(block.attn.c_k.weight, -s, s)
-            torch.nn.init.uniform_(block.attn.c_v.weight, -s, s)
+            torch.nn.init.normal_(block.attn.c_q.weight, mean=0.0, std=std) # weights use Uniform to avoid outliers
+            torch.nn.init.normal_(block.attn.c_k.weight, mean=0.0, std=std)
+            torch.nn.init.normal_(block.attn.c_v.weight, mean=0.0, std=std)
             torch.nn.init.zeros_(block.attn.c_proj.weight) # projections are zero
             # MoE: router gate and expert up-projections get uniform, down-projections get zero
-            torch.nn.init.uniform_(block.moe.router.gate.weight, -s, s)
-            torch.nn.init.uniform_(block.moe.experts.w_up, -s, s)
+            torch.nn.init.normal_(block.moe.router.gate.weight, mean=0.0, std=std)
+            torch.nn.init.normal_(block.moe.experts.w_up, mean=0.0, std=std)
             torch.nn.init.zeros_(block.moe.experts.w_down)
             if block.moe.shared_expert is not None:
-                torch.nn.init.uniform_(block.moe.shared_expert.w_up.weight, -s, s)
+                torch.nn.init.normal_(block.moe.shared_expert.w_up.weight, mean=0.0, std=std)
                 torch.nn.init.zeros_(block.moe.shared_expert.w_down.weight)
             # MoE load balancing buffers (zero after to_empty from meta device)
             block.moe.router.expert_bias.zero_()
@@ -256,7 +256,7 @@ class GPT(nn.Module):
 
         # Value embeddings (init like c_v: uniform with same std)
         for ve in self.value_embeds.values():
-            torch.nn.init.uniform_(ve.weight, -s, s)
+            torch.nn.init.normal_(ve.weight, mean=0.0, std=std)
 
         # Gate weights init to zero so gates start at sigmoid(0) = 0.5, scaled by 2 -> 1.0 (neutral)
         for block in self.transformer.h:
