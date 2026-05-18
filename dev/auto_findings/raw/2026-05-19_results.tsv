@@ -1,0 +1,6 @@
+commit	val_bpb	memory_gb	status	description
+2aa30a5	1.058449	19.7	keep	iter1: replicate session 2 winner (full HP package); cross-session reproducibility
+fb8a1fb	1.057758	19.7	keep	iter2: core/model.py init Uniform -> Normal (-0.0006 noise floor, FIRST CORE EDIT)
+24faaaa	1.074283	19.7	discard	iter3: core/model.py disable QK-norm (+0.0165; QK-norm IS load-bearing at d=8)
+23debb0	1.057530	19.7	keep	iter4: core/model.py RoPE base 10000 -> 100000 (-0.0003 noise floor; seq=2048 too short to benefit)
+6c5f62e	1.062327	19.7	discard	iter5: core/model.py softcap 15 -> 30 (+0.0048; softcap IS load-bearing)
