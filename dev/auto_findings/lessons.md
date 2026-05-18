@@ -34,3 +34,24 @@ Referenced from `auto/program.md` § "Prior session findings."
   System is reproducible to noise floor.
 - LESSON: Cross-session best so far = 1.0576 (iter9 of session 2). Down 5.7% from
   Karpathy's published 0.998 baseline; gap explained by FA2 vs FA3.
+
+### 2026-05-19 (session auto/2026-05-19 — first core/ edits)
+
+- LESSON: QK-norm in core/model.py:CausalSelfAttention.forward is LOAD-BEARING
+  at d=8 (+0.017 val_bpb regression when removed). Verified Karpathy's nanochat
+  choice is not arbitrary. Status: DO-NOT-RETRY-removing.
+- LESSON: softcap=15 in core/model.py:GPT.forward is LOAD-BEARING
+  (+0.005 regression when relaxed to 30). Status: DO-NOT-RETRY-relaxing.
+- LESSON: init scheme Uniform vs Normal (same std) is NOISE-FLOOR at d=8.
+  Either works; Karpathy's preference for Uniform "to avoid outliers" not
+  empirically meaningful at this scale.
+- LESSON: RoPE base 10K vs 100K is NOISE-FLOOR at seq_len=2048. Would matter
+  at seq_len>4096. Skip for d=8 work.
+- LESSON: FA3 hub kernel path (core/flash_attention.py) is currently DEAD —
+  varunneal/flash-attention-3 repo 401's; kernels-community alternatives ABI-
+  mismatch on NGC torch 2.7.0a0+nv25.03. Punt to human: either find replacement
+  kernel or accept FA2 + delete dead code path.
+- LESSON: PLATEAU CONFIRMED at val_bpb ≈ 1.058 across 3 sessions, 22 experiments,
+  $13.20. HP space + nearby arch space EXHAUSTED at d=8/5min/FA2. Stop running
+  Tier 1 in this configuration — ship to Tier 2 OR escalate (FA3 fix, bigger
+  arch shifts).
