@@ -80,7 +80,7 @@ EMBEDDING_LR = 0.6
 UNEMBEDDING_LR = 0.008
 MATRIX_LR = 0.04
 SCALAR_LR = 0.5
-WEIGHT_DECAY = 0.0
+WEIGHT_DECAY = 0.2
 ADAM_BETAS = (0.9, 0.95)
 
 # --- LR schedule shape (used by get_lr_multiplier below) ---
