@@ -6,6 +6,11 @@ torch>=2.7.0,<2.9
 # flash-attn 3 (Hopper-only, sm_90+) is REQUIRED for production bench but provided
 # by the NGC pytorch images (DO NOT pip install on a runtime image — needs nvcc).
 # flash-attn>=3.0.0b1  # uncomment ONLY when using a devel image with nvcc
+# HuggingFace `kernels` enables FA3 hub-kernel auto-loading in core/flash_attention.py
+# on sm_90 (Hopper) GPUs without needing nvcc. Closes ~62% of the val_bpb gap to
+# Karpathy's published d=8 baseline by ~2x'ing throughput vs pip flash-attn 2.
+# See dev/auto_findings/2026-05-18.md and deep_throughput_vs_capability.png.
+kernels
 numpy
 pandas
 einx
