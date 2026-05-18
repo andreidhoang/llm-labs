@@ -1,0 +1,11 @@
+commit	val_bpb	memory_gb	status	description
+b79771e	1.127507	20.6	keep	session 2 baseline (MoE-on default; session 1 baseline was 1.121 — ~0.006 tokenizer variance)
+025122e	1.062026	20.6	keep	iter1: replicate session 1 winner (dense + MATRIX_LR=0.04 + EMBED_LR=0.6) [bears on H_4]
+f11f9fc	1.063568	20.6	discard	iter2: MATRIX_LR 0.04 -> 0.06 (+0.0016; near-optimal at 0.04)
+9e13d7e	1.099455	20.6	discard	iter3: TOTAL_BATCH_SIZE 2^18 -> 2^19 (+0.0375; overshoots Bergsma at d=8) [bears on H_3]
+e03ddc4	1.087347	20.6	discard	iter4: WARMUP_RATIO 0.05 -> 0.0 (+0.0253; early stability beats 15s extra LR training)
+6c123b0	1.061015	20.6	keep	iter5: + WEIGHT_DECAY 0.0 -> 0.2 (-0.001 marginal)
+fb86bb1	1.060142	20.6	keep	iter6: + EMBEDDING_LR 0.6 -> 0.8 (-0.001 cumulative)
+5604b9a	1.058859	20.6	keep	iter7: + ADAM_BETAS beta1 0.9 -> 0.8 (-0.001; below session 1 best)
+4605a53	1.058836	20.6	keep	iter8: + UNEMBEDDING_LR 0.008 -> 0.004 (-0.00002; noise floor, technical keep)
+bc23314	1.057578	20.6	keep	iter9: + WINDOW_PATTERN L -> SSSL (-0.001; FINAL BEST)
