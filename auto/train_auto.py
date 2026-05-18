@@ -81,7 +81,7 @@ UNEMBEDDING_LR = 0.008
 MATRIX_LR = 0.04
 SCALAR_LR = 0.5
 WEIGHT_DECAY = 0.2
-ADAM_BETAS = (0.9, 0.95)
+ADAM_BETAS = (0.8, 0.95)
 
 # --- LR schedule shape (used by get_lr_multiplier below) ---
 WARMUP_RATIO = 0.05                 # fraction of TIME_BUDGET spent warming up
