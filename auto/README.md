@@ -16,6 +16,11 @@ Tier 1 generates priors. Tier 2 generates posteriors. Bridge:
 `dev/auto_findings/<tag>.md` summarizes each session and surfaces Tier 2
 promotion candidates.
 
+> **📊 See [`dev/auto_findings/README.md`](../dev/auto_findings/README.md)
+> for the results of 3 sessions, 22 experiments, $13.22 spent.** Includes
+> cross-session progress plot, knob attribution waterfall, Chinchilla-style
+> throughput analysis, and 5 Tier 2 promotion candidates.
+
 ## Architecture choice
 
 llm-labs's model lives in `core/`. We do NOT duplicate `core/` into `auto/`.
