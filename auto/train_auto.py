@@ -76,7 +76,7 @@ NUM_SHARED_EXPERTS = 0              # MoE: always-active expert
 WINDOW_PATTERN = "L"                # "L" = full causal every layer
 
 # --- Optimizer LRs (passed to model.setup_optimizer) ---
-EMBEDDING_LR = 0.6
+EMBEDDING_LR = 0.8
 UNEMBEDDING_LR = 0.008
 MATRIX_LR = 0.04
 SCALAR_LR = 0.5
