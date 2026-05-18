@@ -291,7 +291,7 @@ class GPT(nn.Module):
                 # Keep frozen SigLIP in bf16 (no gradient → no precision concern)
                 self.vision_tower.siglip.to(dtype=torch.bfloat16)
 
-    def _precompute_rotary_embeddings(self, seq_len, head_dim, base=10000, device=None):
+    def _precompute_rotary_embeddings(self, seq_len, head_dim, base=100000, device=None):
         # TODO: bump base theta more? e.g. 100K is more common more recently
         # autodetect the device from model embeddings
         if device is None:
