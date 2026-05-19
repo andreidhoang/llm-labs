@@ -99,3 +99,24 @@ Referenced from `auto/program.md` § "Prior session findings."
   sec steady-state). Variable image counts per batch make tracing slower.
   Negligible at Tier 2's 2-hour budgets; problematic for autoresearch-style
   5-min budgets.
+
+### 2026-05-19 (FA3 ecosystem diagnostic — confirmed blocked)
+
+- LESSON: Newer NGC image (25.06 with torch 2.8.0a0+nv25.06) STILL ships only
+  FA2 (flash_attn 2.7.4.post1). The requirements.txt comment "NGC pytorch
+  images provide FA3" was an incorrect assumption by the original author.
+  Multiple NGC versions (25.03, 25.06) confirmed FA2-only.
+- LESSON: kernels-community/flash-attn3 hub kernel uploads metadata.json in
+  a format that requires `kernels` package >=0.15. Latest on PyPI is 0.14.1
+  (kernels 0.15 unreleased as of May 2026). All HF Hub FA3 paths blocked
+  until kernels 0.15 ships.
+- LESSON: The hub kernels are prebuilt for "torch28-cxx11-cu129-x86_64-linux"
+  ABI. NGC's nv25.06 build (torch 2.8.0a0+nv25.06 with CUDA 12.8) may have
+  minor ABI differences even if metadata parsing worked.
+- LESSON: Three FA3 paths all blocked in current ecosystem (May 2026):
+  (1) varunneal/flash-attention-3 hub: 401 (repo gone),
+  (2) kernels-community/flash-attn3 hub: metadata parse error,
+  (3) From-source `flash-attention/hopper/setup.py install`: 60-90 min CPU compile.
+  Practical conclusion: ACCEPT FA2 for Tier 1 + Tier 2 work, OR commit to
+  one-time Docker image build with FA3 source-built (~1 hr engineering).
+  Cost: $1 of diagnostic time on NGC 25.06 H200 confirmed this.
