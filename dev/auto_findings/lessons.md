@@ -74,3 +74,28 @@ Referenced from `auto/program.md` § "Prior session findings."
   tokens/sec. Validates sweep_design.md single-instance discipline (§11.1).
   Implication: absolute val_bpb across sessions is contaminated; use
   within-session deltas only.
+
+### 2026-05-19 (multimodal MoE production smoke — engineering verification)
+
+- LESSON: scripts/base_train.py --multimodal path is VERIFIED on real
+  hardware. MoE-on + frozen SigLIP2-SO400M + 3D MRoPE + scatter + per-modality
+  loss decomposition all work together at d=8/H200/MFU=40%. mm_bpb dropped
+  3.15 → 1.91 in 25 steps. Tier 2 sweep_design.md v3 production path is ready.
+- LESSON: bpb_vision_ctx < bpb_text consistently across 3 evals → vision
+  context HELPS next-token prediction (correct direction). If scatter or 3D
+  MRoPE were broken, would expect the opposite.
+- LESSON: r_actual is the FRACTION of text tokens with vision in their
+  attention window, NOT the vision pad-token fraction. At mix_ratio=0.1
+  (pad-token fraction = 0.1), r_actual = 0.885 because most text tokens have
+  at least one vision token within seq_len=2048. Don't conflate the two.
+- LESSON: Multimodal step time is dominated by SigLIP2 forward. At mix_ratio
+  =0.3 (~1200 images/step at B=32 seq=2048): ~44s/step. At mix_ratio=0.1:
+  ~20s/step. Plan Tier 2 wall-clock budgets accordingly.
+- LESSON: torch.compile has a graph break in core/multimodal.py:scatter_vision
+  _features around line 492 — data-dependent branch can't be traced. Training
+  continues with partial compilation. Potential 5-10% Tier 2 speedup if
+  refactored.
+- LESSON: Multimodal first-step compile overhead is ~128 sec on H200 (vs ~20
+  sec steady-state). Variable image counts per batch make tracing slower.
+  Negligible at Tier 2's 2-hour budgets; problematic for autoresearch-style
+  5-min budgets.

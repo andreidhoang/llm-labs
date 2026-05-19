@@ -37,6 +37,11 @@ softcap=15), `[bears on H₀]` evidence that FP8 helps at d=10+ (Tier 2-scale
 validated), and the infrastructure finding that FA3 from-source build path
 is too costly for Tier 1 (needs pre-built image).
 
+**Multimodal MoE engineering also verified** ([smoke writeup](dev/auto_findings/multimodal_smoke.md)):
+real SigLIP2-SO400M + MoE + 3D MRoPE + per-modality loss decomposition all
+co-execute correctly on H200 (MFU 40%, mm_bpb 3.15 → 1.91 over 25 steps).
+Tier 2 sweep_design.md v3 production path is ready when budget commits.
+
 → **[Read the full findings](dev/auto_findings/README.md)** — per-session
 writeups, knob attribution, Chinchilla-style throughput analysis, plots.
 
