@@ -116,7 +116,9 @@ class CausalSelfAttention(nn.Module):
         # Apply Rotary Embeddings to queries and keys to get relative positional encoding
         cos, sin = cos_sin
         q, k = apply_rotary_emb(q, cos, sin), apply_rotary_emb(k, cos, sin)
-        q, k = norm(q), norm(k) # QK norm
+        # QK norm. EMPIRICALLY LOAD-BEARING at d=8: removing this regressed val_bpb
+        # by +0.017 (auto session 3 iter3, dev/auto_findings/2026-05-19.md). Do not remove.
+        q, k = norm(q), norm(k)
 
         # Flash Attention (FA3 on Hopper+, PyTorch SDPA fallback elsewhere)
         # window_size is (left, right) tuple: (N, 0) for causal, (-1, 0) for full context
@@ -634,6 +636,9 @@ class GPT(nn.Module):
                 x = block(x, ve, cos_sin, self.window_sizes[i], kv_cache)
         x = norm(x)
 
+        # Logit softcap. EMPIRICALLY LOAD-BEARING at d=8: relaxing to softcap=30
+        # regressed val_bpb by +0.005 (auto session 3 iter5, dev/auto_findings/2026-05-19.md).
+        # The tanh smoothing prevents large outlier logits that destabilize training.
         softcap = 15 # smoothly cap the logits to the range [-softcap, softcap]
 
         # Forward the lm_head (compute logits) — vanilla path

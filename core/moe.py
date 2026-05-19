@@ -118,8 +118,12 @@ def _run_experts_grouped_mm(w_up, w_down, x, num_tokens_per_expert):
     target_idx = token_idx + cum_pad_before[expert_id]              # (T,)
 
     # Build padded x in BF16 (grouped_mm requires bf16). Allocate dynamic-size buffer.
+    # T_padded is a 0-D Tensor. Eager mode needs int; torch.compile coerces via
+    # specialization. int(T_padded) syncs in eager; the for-loop fallback path
+    # also syncs via .tolist(), so this is consistent. Without int(), eager-mode
+    # runs raise TypeError (verified 2026-05-19 FA3 setup, auto/FA3_SETUP.md §Issue 1).
     x_bf16 = x.bfloat16()
-    x_padded = x_bf16.new_zeros(T_padded, D)
+    x_padded = x_bf16.new_zeros(int(T_padded), D)
     x_padded.index_copy_(0, target_idx, x_bf16)
 
     # Padded offsets for grouped_mm

@@ -42,7 +42,13 @@ def _smoke_test_fa3(fa3_module):
 
 
 def _load_flash_attention_3():
-    """Try to load Flash Attention 3 from HF Kernels Hub (Hopper sm90 only)."""
+    """Try to load Flash Attention 3 from HF Kernels Hub (Hopper sm90 only).
+
+    Tries multiple hub repos in priority order. The varunneal repo briefly went
+    private during 2026-05-19, and the kernels-community repos require newer
+    `kernels` package versions (≥0.15) than PyPI ships. Falling through gracefully
+    lets us survive upstream churn. See dev/auto_findings/lessons.md 2026-05-19.
+    """
     if not torch.cuda.is_available():
         return None
     try:
@@ -52,13 +58,24 @@ def _load_flash_attention_3():
         import os
         os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
         from kernels import get_kernel
-        fa3 = get_kernel('varunneal/flash-attention-3').flash_attn_interface
     except Exception:
         return None
-    # Smoke-test the kernel actually runs (catches ABI mismatch on NGC builds)
-    if not _smoke_test_fa3(fa3):
-        return None
-    return fa3
+    # Priority order: varunneal (nanochat-verified, kernels==0.11.7 compatible) first,
+    # then kernels-community alternatives (require newer `kernels` package).
+    candidate_repos = (
+        'varunneal/flash-attention-3',
+        'kernels-community/flash-attn3',
+        'kernels-community/vllm-flash-attn3',
+    )
+    for repo in candidate_repos:
+        try:
+            fa3 = get_kernel(repo).flash_attn_interface
+        except Exception:
+            continue
+        # Smoke-test the kernel actually runs (catches ABI mismatch on NGC builds)
+        if _smoke_test_fa3(fa3):
+            return fa3
+    return None
 
 
 def _load_flash_attention_2():

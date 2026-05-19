@@ -3,13 +3,18 @@
 # 25.01 ships torch 2.6.0a0 and has been observed to lack torch._grouped_mm.
 # For local CPU dev / testing, torch >= 2.7 keeps behavior closest to H100 runs.
 torch>=2.7.0,<2.9
-# flash-attn 3 (Hopper-only, sm_90+) is REQUIRED for production bench but provided
-# by the NGC pytorch images (DO NOT pip install on a runtime image — needs nvcc).
-# flash-attn>=3.0.0b1  # uncomment ONLY when using a devel image with nvcc
-# HuggingFace `kernels` enables FA3 hub-kernel auto-loading in core/flash_attention.py
-# on sm_90 (Hopper) GPUs without needing nvcc. Closes ~62% of the val_bpb gap to
-# Karpathy's published d=8 baseline by ~2x'ing throughput vs pip flash-attn 2.
-# See dev/auto_findings/2026-05-18.md and deep_throughput_vs_capability.png.
+# flash-attn 3 (Hopper-only, sm_90+) is required for production bench.
+# Verified 2026-05-19: NGC pytorch images SHIP ONLY FA2 (flash_attn 2.7.x);
+# both 25.03 and 25.06 confirmed. The earlier comment claiming NGC provides
+# FA3 was an incorrect assumption. For FA3, two working paths exist:
+#   (a) vanilla PyPI torch 2.9.1+cu128 + kernels==0.11.7 + varunneal/flash-attention-3
+#       hub kernel (verified end-to-end). Recipe: auto/FA3_SETUP.md.
+#   (b) build from source: flash-attention/hopper/setup.py install (~60 min CPU).
+# NGC's custom torch ABI (nv25.03/nv25.06) does NOT match the prebuilt hub kernels.
+# Performance reality at d=8/seq=2048: FA3-alone ≈ FA2 (Chinchilla 2× prediction
+# was overstated; attention is not dominant at this scale).
+# See dev/auto_findings/2026-05-20.md and auto/FA3_SETUP.md.
+# HuggingFace `kernels` provides the hub-kernel loader used by core/flash_attention.py.
 kernels
 numpy
 pandas
