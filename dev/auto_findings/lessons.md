@@ -120,3 +120,32 @@ Referenced from `auto/program.md` § "Prior session findings."
   Practical conclusion: ACCEPT FA2 for Tier 1 + Tier 2 work, OR commit to
   one-time Docker image build with FA3 source-built (~1 hr engineering).
   Cost: $1 of diagnostic time on NGC 25.06 H200 confirmed this.
+
+### 2026-05-19 (FA3 ecosystem — UNBLOCKED via nanochat-exact setup)
+
+- LESSON CORRECTION (supersedes the prior "FA3 blocked" lesson): the earlier
+  401 and metadata-parse failures were specific to NGC custom torch ABI
+  (torch 2.7.0a0+nv25.03, 2.8.0a0+nv25.06). Karpathy's nanochat uses VANILLA
+  PyPI torch 2.9.1+cu128 installed via `uv sync --extra gpu` from
+  https://download.pytorch.org/whl/cu128 — NOT NGC images. With vanilla
+  torch + kernels==0.11.7, `kernels.get_kernel('varunneal/flash-attention-3')`
+  loads cleanly and provides FA3. ABI requirement: torch29-cxx11-cu128-x86_64-linux.
+- LESSON: Replicating nanochat's exact env (Ubuntu 22.04 + pytorch/pytorch:
+  2.8.0-cuda12.8-cudnn9-runtime + apt-get build-essential nvidia-cuda-toolkit
+  python3-dev + uv sync nanochat's pyproject.toml) → FA3 works.
+- LESSON (surprising): FA3 ALONE does NOT close the predicted 62% of gap to
+  Karpathy's 0.998 at d=8. Measured at session 3 winner config:
+    - FA2 + torch.compile + grouped_mm (session 3): 195M tokens, val_bpb=1.058
+    - FA3 + torch.compile + for-loop MoE     (FA3 run): 187M tokens, val_bpb=1.060
+  Roughly equivalent. The Chinchilla-based prediction assumed FA3 = 2x
+  throughput, but at d=8 attention is a small fraction of total compute —
+  FA3's attention speedup doesn't translate to model-level 2x. The 5.7% gap
+  to Karpathy is NOT primarily FA3.
+- LESSON: core/moe.py:_run_experts_grouped_mm has an eager-mode bug
+  (line 122, `x_bf16.new_zeros(T_padded, D)` where T_padded is a Tensor
+  not int). torch.compile masks this by tensor->int conversion in tracing.
+  Workaround for eager runs: DISABLE_GROUPED_MM=1 (for-loop path).
+- LESSON: To use vanilla pytorch image on Vast.ai, need to manually install
+  build-essential + nvidia-cuda-toolkit + python3-dev for torch.compile to
+  work. NGC ships these by default. Choose your tradeoff: NGC = bigger
+  image + custom torch ABI vs vanilla = smaller + works with hub kernels.
