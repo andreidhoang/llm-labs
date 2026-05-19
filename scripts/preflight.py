@@ -334,13 +334,36 @@ def layer5_gpu_smoke() -> bool:
         _print_check(f"CUDA available: {torch.cuda.device_count()} GPU(s) "
                      f"({torch.cuda.get_device_name(0)})", True)
 
-        # Try FA3 import
+        # Probe core.flash_attention to report the ACTIVE dispatch path
+        # (FA3 hub kernel / FA2 pip / SDPA fallback). This is more informative
+        # than a raw flash_attn import because production uses the unified
+        # interface, not the raw flash_attn package directly.
         try:
-            from flash_attn import flash_attn_func  # noqa: F401
-            _print_check("Flash Attention 3 importable", True)
+            from core.flash_attention import (
+                USE_FA3, USE_FA2, HAS_FA3, HAS_FA2,
+            )
         except ImportError as e:
-            _print_check("Flash Attention 3 importable", False, str(e))
-            print(f"      Install: pip install flash-attn --no-build-isolation")
+            _print_check("core.flash_attention importable", False, str(e))
+            return False
+
+        major, _ = torch.cuda.get_device_capability()
+        is_hopper = (major == 9)
+
+        if USE_FA3:
+            _print_check("Flash Attention dispatch", True, "FA3 active (hub kernel)")
+        elif USE_FA2:
+            severity = "OK on non-Hopper" if not is_hopper else "WARN: FA2 on Hopper (FA3 expected)"
+            _print_check("Flash Attention dispatch", not is_hopper, f"FA2 active — {severity}")
+            if is_hopper:
+                print(f"      sm_90 detected but FA3 not loaded. Try:")
+                print(f"        - bash auto/setup_env.sh   (full FA3 recipe)")
+                print(f"        - or see auto/FA3_SETUP.md (NGC ABI mismatch is most common cause)")
+        else:
+            _print_check("Flash Attention dispatch", False,
+                         "SDPA fallback (no flash-attn available)")
+            print(f"      Neither FA3 nor FA2 loaded; HAS_FA3={HAS_FA3} HAS_FA2={HAS_FA2}")
+            print(f"      Install: pip install flash-attn --no-build-isolation  (FA2)")
+            print(f"           or: bash auto/setup_env.sh                       (FA3 via kernels hub)")
             return False
     except Exception as e:
         _print_check(f"GPU layer crashed: {e}", False)
