@@ -468,7 +468,12 @@ class GPT(nn.Module):
         assert len({id(p) for p in grouped_params}) == len(grouped_params), "Optimizer parameter groups overlap"
         assert len(trainable_params) == len(grouped_params), "Some trainable parameters are missing from optimizer groups"
 
-        # Scale the LR for the AdamW parameters by ∝1/√dmodel (tuned for 768 dim model)
+        # Scale the LR for the AdamW parameters by ∝1/√dmodel (anchored at d_model=768, i.e. depth=24).
+        # Empirically validated near the anchor (d∈[20,28]). Below d≈16 the rule overshoots:
+        # auto sessions 1-2 found optimal MATRIX_LR≈0.04 at d=8, which the rule does not predict
+        # (dev/auto_findings/lessons.md). If you operate at d<16, retune via Tier 1 autoresearch
+        # rather than trusting this formula — the signal-to-noise regime departs from the
+        # asymptotic 1/√d_model scaling that justifies this rule.
         dmodel_lr_scale = (model_dim / 768) ** -0.5
         print0(f"Scaling the LR for the AdamW parameters ∝1/√({model_dim}/768) = {dmodel_lr_scale:.6f}")
 
