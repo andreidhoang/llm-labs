@@ -8,12 +8,12 @@ iterates on `core/` directly.
 
 ---
 
-## ⚡ Autoresearch results (3 sessions, $13.22, 22 experiments)
+## ⚡ Autoresearch results (4 sessions, $19.72, 27 experiments)
 
 ![cross-session progress](dev/auto_findings/progress.png)
 
 An AI agent iterates on `core/{model,moe,optim,...}.py` directly, running
-5-minute training experiments on 1×H100/H200 and minimizing `val_bpb`. Three
+5-minute training experiments on 1×H100/H200 and minimizing `val_bpb`. Four
 overnight sessions on Vast.ai produced:
 
 | | val_bpb | improvement | spent |
@@ -22,11 +22,20 @@ overnight sessions on Vast.ai produced:
 | Session 1 best (MoE→dense + LR tune) | 1.0626 | **−5.2%** | $4.51 |
 | Session 2 best (HP fine-tune) | 1.0576 | −5.6% | $5.51 |
 | Session 3 best (first core/ edits) | 1.0575 | −5.6% | $3.20 |
+| Session 4 (FA3 attempt + FP8) | 1.0797 ⓘ | — (different host) | $6.50 |
 | **Karpathy's published d=8 baseline** | **0.998** | (FA3, 2× tokens) | — |
 
-**Five Tier 2 promotion candidates surfaced**, including strong cross-scale
-support for `H₄` (dense beats MoE-on at d=8/5min by 4-5%) and two newly-
-verified load-bearing components in `core/model.py` (QK-norm, softcap=15).
+ⓘ Session 4 best is on a slower physical host (~25% less throughput than
+sessions 1-3). Within-session delta from same-host FA2 baseline: −0.004
+val_bpb at DEPTH=10+FP8 (the sweet spot where FP8 compute savings exceed
+quant overhead).
+
+**Six Tier 2 promotion candidates surfaced** across the 4 sessions:
+strong cross-scale support for `H₄` (dense beats MoE-on at d=8/5min by 4-5%),
+two newly-verified load-bearing components in `core/model.py` (QK-norm,
+softcap=15), `[bears on H₀]` evidence that FP8 helps at d=10+ (Tier 2-scale
+validated), and the infrastructure finding that FA3 from-source build path
+is too costly for Tier 1 (needs pre-built image).
 
 → **[Read the full findings](dev/auto_findings/README.md)** — per-session
 writeups, knob attribution, Chinchilla-style throughput analysis, plots.
