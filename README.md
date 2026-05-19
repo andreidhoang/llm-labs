@@ -42,6 +42,15 @@ real SigLIP2-SO400M + MoE + 3D MRoPE + per-modality loss decomposition all
 co-execute correctly on H200 (MFU 40%, mm_bpb 3.15 → 1.91 over 25 steps).
 Tier 2 sweep_design.md v3 production path is ready when budget commits.
 
+**FA3 ecosystem unblocked** ([recipe](auto/FA3_SETUP.md)): after research into
+nanochat's exact env, FA3 verified working end-to-end with vanilla PyPI torch
+2.9.1+cu128 + `kernels==0.11.7` + `varunneal/flash-attention-3` hub kernel.
+Earlier failures were specific to NGC's custom torch ABI, NOT the FA3
+ecosystem. **Surprising:** FA3 alone (187M tokens, val_bpb=1.060) is roughly
+equivalent to FA2+NGC+grouped_mm (195M, 1.058) at d=8 — the Chinchilla
+prediction that "FA3 closes 62% of gap to Karpathy" was overstated. The
+gap to 0.998 is NOT primarily FA3.
+
 → **[Read the full findings](dev/auto_findings/README.md)** — per-session
 writeups, knob attribution, Chinchilla-style throughput analysis, plots.
 

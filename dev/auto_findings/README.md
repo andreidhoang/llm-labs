@@ -76,6 +76,7 @@ Predicted asymptote of HP-only improvement = +0.0631 cumulative. We achieved
 | [2026-05-19.md](2026-05-19.md) | Session 3: First `core/` edits. QK-norm + softcap=15 verified load-bearing. Plateau confirmed. FA3 path dead upstream. |
 | [2026-05-20.md](2026-05-20.md) | Session 4: FA3 source-build too costly (45 min CPU compile abandoned). FP8 hurts at d=8/50M, helps at d=10+/80M+. Inter-host variance ~25-35% quantified. |
 | [multimodal_smoke.md](multimodal_smoke.md) | One-shot engineering verification (not an autoresearch session): real SigLIP2 + MoE + multimodal training on H200, 25 steps, mm_bpb 3.15 → 1.91. Verifies Tier 2 sweep_design.md v3 production path. |
+| [`../../auto/FA3_SETUP.md`](../../auto/FA3_SETUP.md) | FA3 ecosystem UNBLOCKED via nanochat-exact env (vanilla PyPI torch 2.9.1+cu128 + kernels==0.11.7). Working recipe + the surprise result that FA3 alone ≈ FA2+NGC+grouped_mm at d=8 (Chinchilla overstated). |
 | [lessons.md](lessons.md) | Durable cross-session memory — what to NOT retry. |
 
 Per-session plots: [`plots/2026-05-17.png`](plots/2026-05-17.png), [`plots/2026-05-18.png`](plots/2026-05-18.png), [`plots/2026-05-19.png`](plots/2026-05-19.png), [`plots/2026-05-20.png`](plots/2026-05-20.png).
