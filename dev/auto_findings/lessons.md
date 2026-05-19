@@ -55,3 +55,22 @@ Referenced from `auto/program.md` § "Prior session findings."
   $13.20. HP space + nearby arch space EXHAUSTED at d=8/5min/FA2. Stop running
   Tier 1 in this configuration — ship to Tier 2 OR escalate (FA3 fix, bigger
   arch shifts).
+
+### 2026-05-20 (session auto/2026-05-20 — FA3 attempt + FP8)
+
+- LESSON: FA3 build from source on NGC pytorch:25.03-py3 takes 60-90 min
+  (CPU-bound, 100+ sm_90 kernel specializations). NOT viable for Tier 1
+  per-session install. Need pre-built Docker image OR wait for Dao-AILab
+  pre-built wheels matching nv25.03 ABI. varunneal/flash-attention-3 hub
+  kernel returns 401; kernels-community alternatives ABI-mismatch.
+- LESSON: FP8 via core.fp8.convert_to_float8_training HURTS at d=8/50M params
+  (+0.006 val_bpb regression; MFU goes DOWN). Per-step quant/dequant overhead
+  > compute savings at small scale.
+- LESSON: FP8 starts helping at d=10/80M params (MFU 17% vs 11% BF16). At
+  d=12/120M, MFU reaches 22% but model undertrained at 5min budget.
+  [bears on Tier 2 H₀: FP8-on-shared-expert speedup should be real at d=24].
+- LESSON: Inter-host throughput variance on Vast.ai 1×H200 is ~25-35%. Same
+  GPU spec, same image, same code → different physical machine = different
+  tokens/sec. Validates sweep_design.md single-instance discipline (§11.1).
+  Implication: absolute val_bpb across sessions is contaminated; use
+  within-session deltas only.

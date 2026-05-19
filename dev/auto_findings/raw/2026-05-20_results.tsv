@@ -1,0 +1,6 @@
+commit	val_bpb	memory_gb	status	description
+76e06a8	1.084101	19.7	keep	iter1: clean FA2 baseline on today host (session 3 winner config; tokens=144M; MFU=11.6%)
+76e06a8	1.078126	19.7	keep	iter2: same config rerun (sed missed; effectively FA2 noise sample): 1.084→1.078 = within-host variance
+4b616fa	1.090235	19.5	discard	iter3: FP8 via core.fp8 (+0.006 val_bpb, -4% tokens; FP8 quant overhead > compute savings at d=8 / 50M params; [bears on Tier 2: FP8 needs bigger model])
+f59b321	1.085381	34.0	keep	iter4: DEPTH=12+FP8 (MFU 11→22%, FP8 helps at bigger scale, but model undertrained at 95M tokens)
+0c23d4f	1.079656	26.0	keep	iter5: DEPTH=10 + FP8 (SESSION 4 BEST; FP8 helps at d=10 sweet spot; -0.004 vs iter1 same host)
