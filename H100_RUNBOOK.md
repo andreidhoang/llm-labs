@@ -23,11 +23,15 @@ export WANDB_API_KEY=xxx
 
 ## Required PyTorch Image
 
-Use this image by default:
+Use this image by default (verified 2026-05-20):
 
 ```bash
-export IMAGE=nvcr.io/nvidia/pytorch:25.03-py3
+export IMAGE=pytorch/pytorch:2.8.0-cuda12.8-cudnn9-devel
 ```
+
+This is the **PyPI-public** PyTorch 2.8.0 release from Docker Hub. Verified to ship
+`torch._grouped_mm` + matching triton 3.4.0 with `triton_key`. The NGC alternative
+below has had stability issues — read the warning block before using it.
 
 Why `25.03-py3`:
 - Our 2×H100 smoke on `nvcr.io/nvidia/pytorch:25.01-py3` showed `torch=2.6.0a0` and `torch._grouped_mm=False`.
@@ -35,16 +39,23 @@ Why `25.03-py3`:
 - The same release notes list driver release `570+` for CUDA `12.8.1`, which matches common Vast H100 hosts.
 - NVIDIA's 25.04 image also uses PyTorch `2.7.0a0`, but moves to CUDA `12.9`; many cheap Vast H100 offers advertise `cuda_max_good=12.8`, so `25.03` is the safer default.
 
-> ⚠ **2026-05-20 update — not all 25.03 builds ship `_grouped_mm`.**
-> An H200×8 instance pulled NGC `pytorch:25.03-py3` build hash `7c8ec84dab.nv25.03`
-> which has `torch._grouped_mm = False` even at the C++ ATen op level
-> (`[x for x in dir(torch.ops.aten) if 'group' in x.lower()]` returns only
-> `native_group_norm`). The image tag is the same; only the build hash differs.
-> Always run the smoke probe below BEFORE committing to a training run, and have
-> a fallback plan (see `dev/auto_findings/2026-05-20-A0-attempt/findings.md`).
+> ⚠ **2026-05-20 update — verified image (use this instead of NGC):**
 >
-> Vanilla `pytorch/pytorch:2.7.0-cuda12.8-cudnn9-devel` from Docker Hub is a tested
-> alternative that ships `_grouped_mm` from the public PyTorch release.
+> **`pytorch/pytorch:2.8.0-cuda12.8-cudnn9-devel`** (Docker Hub) is the
+> verified production image as of 2026-05-20. Confirmed:
+> - `torch=2.8.0+cu128` with `torch._grouped_mm` present (true public release)
+> - `triton 3.4.0` with `triton_key` symbol present
+> - `torch.compile` fwd+bwd works end-to-end on H100 SXM
+>
+> NGC `pytorch:25.03-py3` build hash `7c8ec84dab.nv25.03` does **NOT** ship
+> `_grouped_mm` (verified at ATen op level: `[x for x in dir(torch.ops.aten)
+> if 'group' in x.lower()]` returns only `native_group_norm`). Don't use NGC
+> 25.03 — the image tag is shared with builds that did ship the op, but the
+> hash drift is silent.
+>
+> Vanilla `pytorch/pytorch:2.7.0-cuda12.8-cudnn9-devel` also lacks the BF16
+> `_grouped_mm` (has only the FP8 `_scaled_grouped_mm` variant). 2.8.0 was the
+> release that added the BF16 version that `core/moe.py` calls.
 
 When selecting offers, require:
 

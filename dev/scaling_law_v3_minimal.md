@@ -323,19 +323,24 @@ Day 3-4:
 - v3 4-cell draft (REVERTED): $188 — α non-identifiable, V3 config prediction off ~17%
 - **v3 5-cell (this spec, current): $216.** ~25–40% off v2. The cells that survived the cut are the ones first-principles-required for identifiability (3 unique N's, 1 calibration, 1 verification). Cutting any further breaks the math; spending more is the v2 territory.
 
-> ⚠ **2026-05-20 measured MFU update.** A0 launch attempt on Vast 8×H200 / NGC
-> pytorch:25.03-py3 (build `7c8ec84dab.nv25.03`) measured **19.7% MFU** in
-> eager mode with `--activation-ckpt`. The 35% MFU assumption above presumed
-> `torch._grouped_mm` + `torch.compile` were both available; neither was on
-> this build (see `dev/auto_findings/2026-05-20-A0-attempt/findings.md`).
+> ⚠ **2026-05-20 measured MFU update — partially resolved.**
 >
-> At 19.7% MFU the budget projects to **~$650 instead of $216**. Two paths
-> before launch:
-> 1. **Restore a working torch stack** (vanilla `pytorch/pytorch:2.7.0-cuda12.8-cudnn9-devel`
->    image, or a different NGC build that ships `_grouped_mm`) → returns to ~$216.
-> 2. **Accept reduced MFU and re-budget** to ~$650.
+> First attempt (NGC `pytorch:25.03-py3` build `7c8ec84dab.nv25.03`): measured
+> **19.7% MFU** in eager mode with `--activation-ckpt`. NGC build lacked
+> `torch._grouped_mm`. Budget projected to ~$650.
 >
-> Re-spec this section once a known-good image is verified for MFU.
+> Resolution (later same day): switched to verified image
+> `pytorch/pytorch:2.8.0-cuda12.8-cudnn9-devel` (Docker Hub PyPI release).
+> This image ships `torch._grouped_mm` + matching triton with working
+> `torch.compile`. Fixed a latent bug in `core/moe.py` (histc → bincount,
+> commit `8fa6236`) exposed by inductor's strict type checking.
+>
+> A0 still pending re-launch on this verified stack. Expected MFU based on
+> spec assumptions: 35-47% → budget returns to ~$216. Will verify at next
+> launch.
+>
+> See `dev/auto_findings/2026-05-20-A0-attempt/findings.md` for full incident
+> + resolution log.
 
 ---
 

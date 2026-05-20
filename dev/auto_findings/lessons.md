@@ -189,3 +189,28 @@ either in code (committed to `sweep_runner.py`) or in `H100_RUNBOOK.md`
   and ClimbMix shards at `/root/.cache/nanochat/base_data_climbmix/` (~370 MB
   each, fetched via `python -m core.dataset -n N`). Pre-stage both before
   launch. Status: encoded in `H100_RUNBOOK.md` "Provisioning gotchas" §5.
+
+### 2026-05-20 (later — image search + bincount bug fix)
+
+- LESSON: `pytorch/pytorch:2.8.0-cuda12.8-cudnn9-devel` (Docker Hub, public
+  PyPI release) is the verified production image. Ships
+  `torch._grouped_mm` + triton 3.4.0 with `triton_key` symbol + working
+  `torch.compile`. Status: USE THIS as the default Vast image.
+- LESSON: `pytorch/pytorch:2.7.0-cuda12.8-cudnn9-devel` does NOT have
+  `torch._grouped_mm` — only the FP8 variant `_scaled_grouped_mm`. PyTorch
+  2.7 release did not include the BF16 grouped matmul kernel; 2.8 did.
+  Status: DO-NOT-USE for MoE training.
+- LESSON: `core/moe.py:56` used `torch.histc` to count expert assignments,
+  which returns float32. That dtype propagated into `target_idx` (via
+  `torch.arange(T, dtype=orig_cum.dtype)`), and torch.compile's inductor
+  backend rejected the float index in `index_copy_`. Fixed by switching
+  to `torch.bincount` which returns int64 naturally. Commit `8fa6236`.
+  This is a GENUINE BUG FIX — bincount is the correct API for counting
+  integer expert IDs and is also faster. Status: DO-NOT-REVERT.
+- LESSON: When picking an image, always run a 5-min probe on a cheap
+  1-GPU host BEFORE committing to an 8-GPU rental. Probe script:
+  `tests/probe_image.sh` (informal — copy from
+  `dev/auto_findings/2026-05-20-A0-attempt/findings.md` "Working launch
+  command"). Tests `_grouped_mm` + `torch.compile` + tiny `_grouped_mm`
+  call. Costs ~$0.20 per probe. Saves $5-30 of failed-rental cost per
+  hit. Status: encode as `scripts/probe_image.sh` next session.

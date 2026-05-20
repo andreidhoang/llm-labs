@@ -130,3 +130,76 @@ Specifically: try `pytorch/pytorch:2.7.0-cuda12.8-cudnn9-devel` instead of NGC. 
 2. Should `requirements.txt` carry a `triton<3.7` pin? Test on local Mac (no GPU) vs NGC (GPU + pytorch-triton) — they want different things.
 3. Is the v3 spec's MFU assumption (35-47%) ever achievable on Vast H100/H200 in practice, or is it Lambda-cluster-only? The auto/2026-05-17 → 2026-05-20 sessions hit similar issues on H200.
 4. For A0 specifically — can the calibration cell run at smaller compute (e.g., C=5e18 instead of 1.5e19) without losing its purpose? It only needs to match nanochat T6 directionally.
+
+---
+
+## 2026-05-20 (later that day) — RESOLUTION of question #1 + a real code bug uncovered
+
+Found the verified image AND fixed a latent code bug. Summary:
+
+### Image verification (resolves Q1)
+
+Cheap probe ($0.21) on 1× H100 NVL tested two candidates:
+
+| Image | `_grouped_mm` | `torch.compile` | Verdict |
+|---|---|---|---|
+| `pytorch/pytorch:2.7.0-cuda12.8-cudnn9-devel` | ❌ (only `_scaled_grouped_mm`, the FP8 variant) | ✓ | Reject — torch 2.7 didn't ship BF16 grouped_mm |
+| **`pytorch/pytorch:2.8.0-cuda12.8-cudnn9-devel`** | ✅ | ✅ (triton 3.4 + `triton_key`) | **Verified for production** |
+
+PyTorch 2.7.0 release ships only the FP8 variant `torch._scaled_grouped_mm`.
+The BF16 variant `torch._grouped_mm` that `core/moe.py` calls was added in
+the 2.8 release window. NGC `25.03-py3` should have backported it but the
+specific build hash `7c8ec84dab.nv25.03` we rented did not.
+
+### Code bug uncovered: histc → bincount
+
+Once the verified image was running on 8× H100 SXM, A0 launched cleanly into
+`torch.compile` then crashed at inductor compile of `_run_experts_grouped_mm`:
+
+```
+RuntimeError: tensors used as indices must be long, int, byte or bool tensors
+```
+
+Root cause: `torch.histc` (line 56 of `core/moe.py`) returns float32.
+That float dtype propagates into `target_idx` via `dtype=orig_cum.dtype` on
+`torch.arange`, then `x_padded.index_copy_(0, target_idx, x_bf16)` is rejected
+by inductor's strict type checking.
+
+`torch.histc` was the wrong API — it's for histogram of float values.
+The correct API for counting integer expert IDs is `torch.bincount`, which
+returns int64 naturally.
+
+Fix (1 commit, `8fa6236`):
+
+```python
+# Before:
+num_tokens_per_expert = torch.histc(
+    selected_experts.float().view(-1),
+    bins=self.num_experts, min=0, max=self.num_experts,
+)
+
+# After:
+num_tokens_per_expert = torch.bincount(
+    selected_experts.view(-1),
+    minlength=self.num_experts,
+)
+```
+
+This is **a genuine bug fix**, not an environmental compromise. The
+`histc → bincount` change:
+- Returns int64 (correct dtype for indexing)
+- Is faster (no float binning overhead)
+- Is semantically clearer (counting integer values)
+- Preserves all architecture-test correctness (14/14 pass)
+
+### Net status
+
+- ✅ Image verified: `pytorch/pytorch:2.8.0-cuda12.8-cudnn9-devel`
+- ✅ Bug fixed: histc → bincount in commit `8fa6236`
+- ✅ All architecture tests pass with the fix
+- ⏳ A0 itself: not yet completed — host disappeared mid-launch (host 35504359
+  had a transient outage; came back online minutes later as the same offer).
+  This session's actual A0 cost: $0.21 (probe) + $0.50 (interrupted launch) = $0.71.
+
+Next session: re-rent 8× H100 SXM with the verified image + verified code,
+launch A0 with full spec defaults. Expected MFU now: 35-47% per spec target.
