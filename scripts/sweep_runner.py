@@ -59,6 +59,11 @@ def build_torchrun_cmd(config: dict) -> list[str]:
     cmd = [
         "torchrun",
         "--nproc-per-node=8",
+        # `--` separates torchrun's own flags from the training script + its args.
+        # Without it, base_train.py's --run=XXX prefix-matches torchrun's --run-path
+        # and torchrun errors out with "ambiguous option: --run=...". Verified
+        # 2026-05-20 on NGC pytorch:25.03-py3.
+        "--",
         "scripts/base_train.py",
         f"--depth={arch['num_hidden_layers']}",
         f"--head-dim={arch['head_dim']}",
@@ -71,7 +76,10 @@ def build_torchrun_cmd(config: dict) -> list[str]:
         f"--unembedding-lr={opt['unembedding_lr']}",
         f"--scalar-lr={opt['scalar_lr']}",
         f"--weight-decay={opt['weight_decay']}",
-        f"--warmup-frac={opt['warmup_frac']}",
+        # NOTE: base_train.py uses --warmup-steps (int, default 40), NOT --warmup-frac.
+        # Configs carry warmup_frac for documentation but it's not propagated to the CLI.
+        # Production warmup is 40 steps; at A0 (~250 iters) that's ~16% warmup — slightly
+        # longer than the spec's 5% but inside the validated nanochat regime.
         f"--final-lr-frac={opt['final_lr_frac']}",
         f"--run={config['cell_id']}",
     ]
@@ -209,6 +217,11 @@ def submit(config_path: Path, dry_run: bool = False) -> dict | None:
         print("  [dry-run: not actually executing]")
         return None
 
+    # Default wandb to offline mode so cells launch on hosts without WANDB_API_KEY.
+    # Override by setting WANDB_MODE=online in the parent env (and providing a key).
+    env = os.environ.copy()
+    env.setdefault("WANDB_MODE", "offline")
+
     start = time.time()
     proc = subprocess.run(
         cmd,
@@ -216,6 +229,7 @@ def submit(config_path: Path, dry_run: bool = False) -> dict | None:
         capture_output=True,
         text=True,
         timeout=int(config["max_runtime_seconds"] + 300),
+        env=env,
     )
     elapsed_seconds = time.time() - start
     elapsed_hours = elapsed_seconds / 3600
