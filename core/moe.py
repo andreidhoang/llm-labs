@@ -272,15 +272,20 @@ class MoE(nn.Module):
         token_ids = token_indices_sorted // self.top_k                  # map back to original token
         routed_input = x_flat[token_ids]                                # (T*K, dim)
 
-        # Step 3: Pre-multiply by routing scores (score_before_experts strategy)
-        routed_input = (routed_input.float() * scores_sorted.unsqueeze(-1)).to(x.dtype)
-
-        # Step 4: Shared expert — runs on ALL tokens via standard dense matmul
+        # Step 3: Shared expert — runs on ALL tokens via standard dense matmul
         # Launched before routed experts so compute can overlap (no data dependency)
         shared_output = self.shared_expert(x_flat) if self.shared_expert is not None else None
 
-        # Step 5: Run routed experts on their assigned token blocks
+        # Step 4: Run routed experts on their assigned token blocks (raw input, NO pre-scale)
         routed_output = self.experts(routed_input, num_tokens_per_expert)
+
+        # Step 5: POST-SCALE by routing weights (the score acts as a linear gate on the expert
+        # output, NOT pre-multiplied into the input). For a ReLU² expert, pre-scaling x by s
+        # gives expert(s·x) = s²·expert(x), which dampens the MoE contribution by an extra
+        # factor of s. Post-scale recovers the standard Σ_k s_k · expert_k(x) combine that
+        # the DeepSeek-V3 / Switch literature assumes. See dev/architecture_review_findings
+        # finding C1 for the empirical verification.
+        routed_output = (routed_output.float() * scores_sorted.unsqueeze(-1)).to(x.dtype)
 
         # Step 6: Scatter outputs back to original positions and sum over top-K
         combined = torch.zeros(

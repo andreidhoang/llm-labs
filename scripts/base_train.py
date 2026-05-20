@@ -514,6 +514,19 @@ while True:
             )
         else:
             print0(f"Step {step:05d} | Validation bpb: {val_bpb:.6f}")
+        # structured trajectory point for sweep_runner.parse_trajectory (Hoffmann fitting)
+        tokens_seen = total_batch_size * step
+        if val_mm is not None:
+            print0(
+                f"TRAJ_POINT | step={step} | tokens={tokens_seen} | flops={flops_so_far:.6e} "
+                f"| val_bpb={val_bpb:.6f} | val_text={val_mm['bpb_text']:.6f} "
+                f"| val_vision={val_mm['bpb_vision']:.6f} | r_actual={val_mm['r_actual']:.3f}"
+            )
+        else:
+            print0(
+                f"TRAJ_POINT | step={step} | tokens={tokens_seen} | flops={flops_so_far:.6e} "
+                f"| val_bpb={val_bpb:.6f}"
+            )
         if val_bpb < min_val_bpb:
             min_val_bpb = val_bpb
         val_log_data = {

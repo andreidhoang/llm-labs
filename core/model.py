@@ -286,6 +286,19 @@ class GPT(nn.Module):
                 spatial_merge_size=self.config.vision_spatial_merge_size,
                 freeze_merger=self.config.freeze_vision_merger,
             )
+            # PatchMerger init: trunk convention is uniform(-s, s) with s ∝ 1/√fan_in.
+            # The trunk's other matrices all have fan_in = n_embd, but the merger's fc1
+            # has fan_in = vision_embed_dim·merge² (= 4608 for SigLIP2-SO400M + 2×2 merge),
+            # so we use a true fan_in-based scale instead of the trunk's fixed s.
+            # Default nn.Linear init (kaiming_uniform_(a=√5)) gives std ≈ 3× too small at
+            # the modality boundary, causing vision-position embeddings to be silently
+            # dominated by text-position embeddings. See review finding H1.
+            for layer in (self.vision_tower.merger.fc1, self.vision_tower.merger.fc2):
+                fan_in = layer.in_features
+                s_layer = (3.0 ** 0.5) * (fan_in ** -0.5)
+                torch.nn.init.uniform_(layer.weight, -s_layer, s_layer)
+                if layer.bias is not None:
+                    torch.nn.init.zeros_(layer.bias)
             # Move to same device/dtype as the trunk
             target_device = self.transformer.wte.weight.device
             self.vision_tower.to(device=target_device)
@@ -320,6 +333,13 @@ class GPT(nn.Module):
 
         Pattern string is tiled across layers. Final layer always gets L (full context).
         Characters: L=long (full context), S=short (half context)
+
+        MULTIMODAL CAVEAT (review finding H3): the short-window layers may truncate
+        attention across image-block boundaries. A single image at SigLIP2-SO400M /
+        merge=2 produces ~169 vision tokens; an "S" layer with window = sequence_len/2
+        can position the attention window so an image's patches fall outside the
+        text caption that describes them. For multimodal runs, prefer
+        `window_pattern="L"` unless this interaction has been verified harmless.
         """
         pattern = config.window_pattern.upper()
         assert all(c in "SL" for c in pattern), f"Invalid window_pattern: {pattern}. Use only S and L."

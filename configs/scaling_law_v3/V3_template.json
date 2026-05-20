@@ -1,0 +1,52 @@
+{
+  "cell_id": "V3",
+  "phase": "2_verification",
+  "_purpose": "Held-out preregistered verification at C=6e19. Depth/hidden_size are TEMPLATE — they must be filled in post-fit from sweep_runner fit-hoffmann output, then this file copied to V3.json and committed to dev/LOG.md BEFORE submission. See dev/scaling_law_v3_minimal.md §6 + §4.2 of v2 spec.",
+  "compute_budget_target_flops": 6e19,
+  "architecture_config": {
+    "head_dim": 128,
+    "hidden_size": "TBD_FROM_FIT",
+    "intermediate_size": "TBD_FROM_FIT",
+    "num_attention_heads": "TBD_FROM_FIT",
+    "num_hidden_layers": "TBD_FROM_FIT",
+    "num_key_value_heads": "TBD_FROM_FIT",
+    "rms_norm_eps": 1e-6,
+    "rope_theta": 1000000,
+    "tie_word_embeddings": false,
+    "dtype": "bfloat16",
+    "vocab_size": 32000
+  },
+  "moe_config": {
+    "num_experts": 8,
+    "top_k": 2,
+    "num_shared_experts": 1
+  },
+  "multimodal_config": {
+    "enabled": true,
+    "mix_ratio_r": 0.3,
+    "freeze_vision": true,
+    "freeze_merger_after_warmup_frac": 0.05
+  },
+  "optimizer_config": {
+    "matrix_lr": 0.02,
+    "embedding_lr": 0.3,
+    "unembedding_lr": 0.008,
+    "scalar_lr": 0.5,
+    "weight_decay": 0.28,
+    "warmup_frac": 0.05,
+    "final_lr_frac": 0.05
+  },
+  "max_seq_len": 4096,
+  "target_param_data_ratio": 12,
+  "max_runtime_seconds": 23400,
+  "model_seed": 0,
+  "n_evals": 16,
+  "_preregistration": {
+    "predicted_n_active_params": "TBD",
+    "predicted_d_tokens": "TBD",
+    "predicted_final_val_bpb": "TBD",
+    "fit_git_sha": "TBD",
+    "gate_d_tolerance_nats": 0.10,
+    "rule": "Fill these BEFORE submission, commit to git AND dev/LOG.md. Any post-hoc edit invalidates falsification."
+  }
+}

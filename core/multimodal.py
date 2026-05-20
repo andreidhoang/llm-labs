@@ -481,6 +481,15 @@ def scatter_vision_features(
 
     Note on cloning: inputs_embeds may be a view; clone before mutating to
     avoid silent in-place issues with autograd.
+
+    ORDERING INVARIANT (review finding H4):
+        Boolean-mask scatter `out[mask] = src` assigns src[i] to the i-th True position
+        of mask in ROW-MAJOR order (batch 0 first, then batch 1, ...). This implicitly
+        couples the order images are concatenated into `pixel_values` (and therefore the
+        output order of VisionTower) with the order True positions appear in
+        image_pad_mask. If the dataloader emits images in a different order from how
+        image_pad_mask scans, the WRONG vision features land at the WRONG positions —
+        silent, no shape error. Dataloader and model boundary share this invariant.
     """
     n_pad = int(image_pad_mask.sum().item())
     assert n_pad == vision_features.shape[0], (
@@ -525,6 +534,12 @@ def build_position_ids_for_mm(
                     For text tokens: (t, 0, 0)
                     For vision tokens: (t, h, w) per the image grid
     """
+    # Position-ID design notes (review finding H2):
+    #   vision_start_token_id (BOI) and vision_end_token_id (EOI), if present in the
+    #   sequence, fall through to the text branch below — they receive (next_t, 0, 0)
+    #   sequential positions, NOT image (t, h, w) positions. This matches Qwen3-VL's
+    #   convention (BOI/EOI are control tokens, not patches). If a future design uses
+    #   different semantics, this function must be extended to branch on those token IDs.
     B, S = input_ids.shape
     pos = torch.zeros(3, B, S, dtype=torch.long, device=input_ids.device)
     for b in range(B):
