@@ -53,12 +53,21 @@ class TopKRouter(nn.Module):
         biased_scores = scores + self.expert_bias
         _, selected_experts = torch.topk(biased_scores, k=self.top_k, dim=-1, sorted=False)
         top_scores = scores.gather(dim=-1, index=selected_experts)
-        num_tokens_per_expert = torch.histc(
-            selected_experts.float().view(-1),
-            bins=self.num_experts, min=0, max=self.num_experts,
+        # bincount returns int64 — the correct dtype for downstream indexing in
+        # _run_experts_grouped_mm (target_idx is used as an index into x_padded
+        # via index_copy_, which rejects float-dtype indices). torch.histc would
+        # return float32 here; verified 2026-05-20 that this caused an
+        # inductor-time `RuntimeError: tensors used as indices must be long,
+        # int, byte or bool tensors` when torch.compile is enabled. bincount
+        # is also faster (no float binning) and semantically the correct API
+        # for counting integer expert IDs.
+        num_tokens_per_expert = torch.bincount(
+            selected_experts.view(-1),
+            minlength=self.num_experts,
         )
-        # Accumulate token counts for load balancing updates
-        self.tokens_per_expert_counter += num_tokens_per_expert
+        # Accumulate token counts for load balancing updates (counter is float
+        # for averaging downstream; cast the int64 counts up at the boundary).
+        self.tokens_per_expert_counter += num_tokens_per_expert.to(self.tokens_per_expert_counter.dtype)
         return top_scores, selected_experts, num_tokens_per_expert
 
     def update_expert_bias(self, coeff=1e-3):
