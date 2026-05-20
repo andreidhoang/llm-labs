@@ -149,3 +149,43 @@ Referenced from `auto/program.md` § "Prior session findings."
   build-essential + nvidia-cuda-toolkit + python3-dev for torch.compile to
   work. NGC ships these by default. Choose your tradeoff: NGC = bigger
   image + custom torch ABI vs vanilla = smaller + works with hub kernels.
+
+### 2026-05-20 (session 2026-05-20-A0-attempt — Vast 8×H200 + NGC pytorch:25.03-py3)
+
+Six independent provisioning issues surfaced during the A0 launch. All fixed,
+either in code (committed to `sweep_runner.py`) or in `H100_RUNBOOK.md`
+"Provisioning gotchas (2026-05-20)" section. Full incident report in
+`dev/auto_findings/2026-05-20-A0-attempt/findings.md`. Quick reference:
+
+- LESSON: NGC pytorch:25.03-py3 build hash `7c8ec84dab.nv25.03` does NOT ship
+  `torch._grouped_mm` (verified at ATen op level). The image tag is the same
+  as builds that do. Probe before relying on the runbook's "25.03 always has
+  it" claim. Status: DO-NOT-TRUST-NGC-25.03-BLINDLY.
+- LESSON: `pip install -r requirements.txt` on NGC overwrites
+  `pytorch-triton 3.2.0+nvinternal` with vanilla `triton 3.7.0` from PyPI,
+  breaking `from triton.compiler.compiler import triton_key` that NGC's torch
+  imports. Fix at install time: `grep -v -E "^triton" requirements.txt`.
+  Workaround at runtime: `TORCHDYNAMO_DISABLE=1`.
+- LESSON: `torchrun --run=X scripts/X.py --run=A0` errors with
+  "ambiguous option: --run= could match --run-path". Insert `--` between
+  torchrun args and the script. Now in `sweep_runner.build_torchrun_cmd`.
+- LESSON: `base_train.py` does NOT accept `--warmup-frac` (only
+  `--warmup-steps`, default 40). Old configs carrying `warmup_frac: 0.05`
+  must not be propagated to the CLI. Removed from `sweep_runner`.
+- LESSON: `base_train.py --run=A0` (non-"dummy") triggers `wandb.init()`
+  which fails without `WANDB_API_KEY`. `sweep_runner` now defaults
+  `WANDB_MODE=offline` in the launch env. For direct torchrun, export it.
+- LESSON: Default `--device-batch-size=32 max_seq_len=4096` OOMs on H200
+  (140 GB) at d=24 in eager mode (no torch.compile). Use `--device-batch-size=16
+  --activation-ckpt`. Trade is required without `torch.compile`.
+- LESSON: At 19.7% MFU (measured, this session, eager + activation-ckpt +
+  for-loop MoE on 8×H200), the v3 scaling-law study budget projects to
+  ~$650 instead of the spec's ~$216. Either restore a working torch stack
+  (vanilla pytorch image + matched triton) OR re-budget. The spec's 35-47%
+  MFU assumption is brittle — it requires both `_grouped_mm` AND
+  `torch.compile` working, which is not guaranteed by image tag alone.
+- LESSON: `base_train.py` requires the nanochat tokenizer at
+  `/root/.cache/nanochat/tokenizer/tokenizer.pkl` (40 KB, scp from local Mac)
+  and ClimbMix shards at `/root/.cache/nanochat/base_data_climbmix/` (~370 MB
+  each, fetched via `python -m core.dataset -n N`). Pre-stage both before
+  launch. Status: encoded in `H100_RUNBOOK.md` "Provisioning gotchas" §5.

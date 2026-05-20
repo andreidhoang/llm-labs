@@ -35,6 +35,17 @@ Why `25.03-py3`:
 - The same release notes list driver release `570+` for CUDA `12.8.1`, which matches common Vast H100 hosts.
 - NVIDIA's 25.04 image also uses PyTorch `2.7.0a0`, but moves to CUDA `12.9`; many cheap Vast H100 offers advertise `cuda_max_good=12.8`, so `25.03` is the safer default.
 
+> ⚠ **2026-05-20 update — not all 25.03 builds ship `_grouped_mm`.**
+> An H200×8 instance pulled NGC `pytorch:25.03-py3` build hash `7c8ec84dab.nv25.03`
+> which has `torch._grouped_mm = False` even at the C++ ATen op level
+> (`[x for x in dir(torch.ops.aten) if 'group' in x.lower()]` returns only
+> `native_group_norm`). The image tag is the same; only the build hash differs.
+> Always run the smoke probe below BEFORE committing to a training run, and have
+> a fallback plan (see `dev/auto_findings/2026-05-20-A0-attempt/findings.md`).
+>
+> Vanilla `pytorch/pytorch:2.7.0-cuda12.8-cudnn9-devel` from Docker Hub is a tested
+> alternative that ships `_grouped_mm` from the public PyTorch release.
+
 When selecting offers, require:
 
 ```bash
@@ -67,6 +78,97 @@ PY
 but this repo currently calls the private `torch._grouped_mm` path. Treat public
 `grouped_mm` without private `_grouped_mm` as a code-port task, not as a green
 light for performance training.
+
+## Provisioning gotchas (2026-05-20)
+
+A full sweep of issues discovered launching A0 on Vast 8×H200 / NGC 25.03 is in
+`dev/auto_findings/2026-05-20-A0-attempt/findings.md`. The five most important:
+
+### 1. `pip install -r requirements.txt` overwrites NGC's `pytorch-triton`
+
+NGC ships `pytorch-triton 3.2.0+gitb2684bf3b.nvinternal` which provides the
+`triton_key` symbol that NGC's `torch 2.7.0a0` imports. `pip install triton`
+(or `pip install -r requirements.txt`) pulls vanilla triton 3.7.0 from PyPI,
+which removed `triton_key`. Result: `torch.compile` fails with
+`ImportError: cannot import name 'triton_key' from 'triton.compiler.compiler'`.
+
+Fix at install time:
+
+```bash
+# Skip the triton line when installing in an NGC image:
+grep -v -E "^triton" requirements.txt | grep -v "^#" | grep -v "^$" > /tmp/reqs.txt
+pip install -r /tmp/reqs.txt
+```
+
+Fix at runtime (workaround if triton already overwritten):
+
+```bash
+export TORCHDYNAMO_DISABLE=1   # disables torch.compile; runs eager mode
+```
+
+### 2. `WANDB_API_KEY` must be set OR `WANDB_MODE=offline`
+
+`base_train.py` invokes `wandb.init(...)` whenever `--run` is not the literal
+string `"dummy"`. Fresh hosts have no key; sweep_runner now defaults
+`WANDB_MODE=offline` in the launch env. For direct `torchrun` invocations:
+
+```bash
+export WANDB_MODE=offline
+```
+
+### 3. `--device-batch-size=32` OOMs at d24/seq=4096 in eager mode
+
+H200 has 140 GB/GPU. With `torch.compile` disabled AND no `--activation-ckpt`,
+the trunk activations + intermediate tensors at depth 24 exceed 140 GB.
+For d24/seq=4096 in eager mode, use:
+
+```bash
+torchrun ... --device-batch-size=16 --activation-ckpt
+```
+
+`--activation-ckpt` recomputes activations during backward (~33% compute overhead)
+but cuts memory by ~5×. Trade is required when `torch.compile` is unavailable.
+
+### 4. `torchrun --run=X` needs `--` separator before the script
+
+`torchrun`'s argparse prefix-matches `--run-path`, so `--run=A0` to the training
+script is consumed by torchrun → "ambiguous option" error. Insert `--`:
+
+```bash
+torchrun --nproc-per-node=8 -- scripts/base_train.py --run=A0 ...
+```
+
+`sweep_runner.py` already does this (since 2026-05-20).
+
+### 5. Tokenizer + data must be pre-staged before launch
+
+`base_train.py` reads `/root/.cache/nanochat/tokenizer/tokenizer.pkl` and
+`/root/.cache/nanochat/base_data_climbmix/shard_*.parquet`. Fresh hosts have
+neither. Bootstrap:
+
+```bash
+# Tokenizer: scp from local Mac (only 40 KB)
+scp -P $PORT -r ~/.cache/nanochat/tokenizer root@$HOST:/root/.cache/nanochat/
+
+# Data: download from HF (~370 MB/shard; ~50 shards for A0 dense @ d24)
+ssh -p $PORT root@$HOST 'cd /workspace/llm-labs && \
+  PYTHONPATH=. python -m core.dataset -n 60 -w 8'
+```
+
+`core.dataset` will fetch from `karpathy/climbmix-400b-shuffle` on HuggingFace
+and always also download the validation shard (shard_06542).
+
+### Measured throughput on H200 with these workarounds
+
+| Configuration | MFU | Wall-clock multiplier vs spec |
+|---|---|---|
+| Spec target (FA3 + torch.compile + grouped_mm) | 47% | 1× |
+| **Observed: eager + activation-ckpt + for-loop MoE** | **~20%** | **~2.4×** |
+| Expected: torch.compile working, grouped_mm working, no activation-ckpt | ~40% | ~1.2× |
+
+Cost implication: at observed 20% MFU, the v3 study budget projects to
+**~$650 instead of ~$216**. Either restore a known-good image OR re-budget;
+see `dev/auto_findings/2026-05-20-A0-attempt/findings.md` §"Two paths forward".
 
 ## Run the bench (one command)
 

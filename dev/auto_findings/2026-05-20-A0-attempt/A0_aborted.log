@@ -1,0 +1,314 @@
+Launch time: 2026-05-20T09:32:13Z
+W0520 09:32:16.158000 13515 torch/distributed/run.py:763] 
+W0520 09:32:16.158000 13515 torch/distributed/run.py:763] *****************************************
+W0520 09:32:16.158000 13515 torch/distributed/run.py:763] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0520 09:32:16.158000 13515 torch/distributed/run.py:763] *****************************************
+2026-05-20 09:32:26,664 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/varunneal/overview "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:26,772 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/varunneal/overview "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:26,823 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/varunneal/overview "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:26,844 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+/usr/local/lib/python3.12/dist-packages/kernels/utils.py:391: FutureWarning: Future versions of `kernels` (>=0.15) will require specifying a kernel version or revision. See: https://huggingface.co/docs/kernels/migration
+  revision = select_revision_or_version(repo_id, revision=revision, version=version)
+2026-05-20 09:32:26,889 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/varunneal/overview "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:26,912 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/varunneal/overview "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:26,949 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/varunneal/overview "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:26,955 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/varunneal/overview "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:26,956 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+/usr/local/lib/python3.12/dist-packages/kernels/utils.py:391: FutureWarning: Future versions of `kernels` (>=0.15) will require specifying a kernel version or revision. See: https://huggingface.co/docs/kernels/migration
+  revision = select_revision_or_version(repo_id, revision=revision, version=version)
+2026-05-20 09:32:26,958 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/varunneal/overview "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:26,987 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+/usr/local/lib/python3.12/dist-packages/kernels/utils.py:391: FutureWarning: Future versions of `kernels` (>=0.15) will require specifying a kernel version or revision. See: https://huggingface.co/docs/kernels/migration
+  revision = select_revision_or_version(repo_id, revision=revision, version=version)
+2026-05-20 09:32:27,016 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-20 09:32:27,016 - huggingface_hub.utils._http - [33m[1mWARNING[0m - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-20 09:32:27,066 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+/usr/local/lib/python3.12/dist-packages/kernels/utils.py:391: FutureWarning: Future versions of `kernels` (>=0.15) will require specifying a kernel version or revision. See: https://huggingface.co/docs/kernels/migration
+  revision = select_revision_or_version(repo_id, revision=revision, version=version)
+2026-05-20 09:32:27,088 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+/usr/local/lib/python3.12/dist-packages/kernels/utils.py:391: FutureWarning: Future versions of `kernels` (>=0.15) will require specifying a kernel version or revision. See: https://huggingface.co/docs/kernels/migration
+  revision = select_revision_or_version(repo_id, revision=revision, version=version)
+2026-05-20 09:32:27,129 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+/usr/local/lib/python3.12/dist-packages/kernels/utils.py:391: FutureWarning: Future versions of `kernels` (>=0.15) will require specifying a kernel version or revision. See: https://huggingface.co/docs/kernels/migration
+  revision = select_revision_or_version(repo_id, revision=revision, version=version)
+2026-05-20 09:32:27,132 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+/usr/local/lib/python3.12/dist-packages/kernels/utils.py:391: FutureWarning: Future versions of `kernels` (>=0.15) will require specifying a kernel version or revision. See: https://huggingface.co/docs/kernels/migration
+  revision = select_revision_or_version(repo_id, revision=revision, version=version)
+2026-05-20 09:32:27,138 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-20 09:32:27,139 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,139 - huggingface_hub.utils._http - [33m[1mWARNING[0m - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+/usr/local/lib/python3.12/dist-packages/kernels/utils.py:391: FutureWarning: Future versions of `kernels` (>=0.15) will require specifying a kernel version or revision. See: https://huggingface.co/docs/kernels/migration
+  revision = select_revision_or_version(repo_id, revision=revision, version=version)
+2026-05-20 09:32:27,170 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:27,206 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,251 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:27,282 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-20 09:32:27,282 - huggingface_hub.utils._http - [33m[1mWARNING[0m - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-20 09:32:27,322 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-20 09:32:27,323 - huggingface_hub.utils._http - [33m[1mWARNING[0m - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-20 09:32:27,334 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-20 09:32:27,335 - huggingface_hub.utils._http - [33m[1mWARNING[0m - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-20 09:32:27,341 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:27,341 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,370 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,384 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,396 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,415 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,464 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,477 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,479 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,481 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,512 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,526 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,533 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,545 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,621 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,625 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,629 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,631 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,656 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,676 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,686 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,696 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,792 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,808 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,808 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,810 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,845 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,846 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/vllm-flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:27,861 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+2026-05-20 09:32:27,872 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,016 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,031 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/vllm-flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:28,031 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,035 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/organizations/kernels-community/overview "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,043 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,050 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/vllm-flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:28,052 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/vllm-flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:28,061 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/vllm-flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-20 09:32:28,061 - huggingface_hub.utils._http - [33m[1mWARNING[0m - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-20 09:32:28,267 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/vllm-flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:28,278 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/vllm-flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:28,278 - httpx - [32m[1mINFO[0m - HTTP Request: HEAD https://huggingface.co/kernels/kernels-community/vllm-flash-attn3/resolve/main/kernel-status.toml "HTTP/1.1 404 Not Found"
+2026-05-20 09:32:28,278 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,287 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,288 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,289 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,292 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,431 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,438 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,454 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main/build?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,456 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,467 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,470 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,475 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,476 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,575 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,586 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,691 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,691 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/revision/main "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,719 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,748 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,783 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,929 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:28,948 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+
+                                                       █████                █████
+                                                      ░░███                ░░███
+     ████████    ██████   ████████    ██████   ██████  ░███████    ██████  ███████
+    ░░███░░███  ░░░░░███ ░░███░░███  ███░░███ ███░░███ ░███░░███  ░░░░░███░░░███░
+     ░███ ░███   ███████  ░███ ░███ ░███ ░███░███ ░░░  ░███ ░███   ███████  ░███
+     ░███ ░███  ███░░███  ░███ ░███ ░███ ░███░███  ███ ░███ ░███  ███░░███  ░███ ███
+     ████ █████░░████████ ████ █████░░██████ ░░██████  ████ █████░░███████  ░░█████
+    ░░░░ ░░░░░  ░░░░░░░░ ░░░░ ░░░░░  ░░░░░░   ░░░░░░  ░░░░ ░░░░░  ░░░░░░░░   ░░░░░
+    
+Autodetected device type: cuda
+2026-05-20 09:32:29,101 - httpx - [32m[1mINFO[0m - HTTP Request: GET https://huggingface.co/api/kernels/kernels-community/vllm-flash-attn3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-20 09:32:33,919 - core.common - [32m[1mINFO[0m - Distributed world size: 8
+GPU: NVIDIA H200 | Peak FLOPS (BF16): 9.89e+14
+COMPUTE_DTYPE: torch.bfloat16 (auto-detected: CUDA SM 90 (bf16 supported))
+wandb: Tracking run with wandb version 0.26.1
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /workspace/llm-labs/wandb/offline-run-20260520_093234-c3loz2mt
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+WARNING: Flash Attention 3 not available, using PyTorch SDPA fallback
+WARNING: Training will be less efficient without FA3
+WARNING: SDPA has no support for sliding window attention (window_pattern='SSSL'). Your GPU utilization will be terrible.
+WARNING: Recommend using --window-pattern L for full context attention without alternating sliding window patterns.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Vocab size: 512
+Model config:
+{
+  "sequence_len": 4096,
+  "vocab_size": 512,
+  "n_layer": 24,
+  "n_head": 12,
+  "n_kv_head": 12,
+  "n_embd": 1536,
+  "num_experts": 1,
+  "top_k": 1,
+  "num_shared_experts": 0,
+  "window_pattern": "SSSL",
+  "multimodal": false,
+  "vision_embed_dim": 1152,
+  "vision_spatial_merge_size": 2,
+  "siglip_model_id": "google/siglip2-so400m-patch14-384",
+  "image_pad_token_id": -1,
+  "freeze_vision_merger": false
+}
+✓ Activation checkpointing enabled (per-block, use_reentrant=False)
+torch.compile(... {'dynamic': False, 'mode': 'default'})
+Parameter counts:
+wte                     : 786,432
+value_embeds            : 9,437,184
+lm_head                 : 786,432
+transformer_matrices    : 679,518,720
+active_transformer_matrices: 679,518,720
+scalars                 : 48
+moe_inactive            : 0
+trunk_total             : 690,528,816
+active_trunk_total      : 690,528,816
+vision_total            : 0
+vision_trainable        : 0
+vision_frozen           : 0
+trainable_total         : 690,528,816
+trainable_active_total  : 690,528,816
+total                   : 690,528,816
+active_total            : 690,528,816
+Estimated FLOPs per token: 5.214293e+09
+Auto-computed optimal batch size: 1,048,576 tokens
+Scaling LRs by 1.4142 for batch size 1,048,576 (reference: 524,288)
+Scaling weight decay from 0.280000 to 0.049672 for depth 24
+Scaling the LR for the AdamW parameters ∝1/√(1536/768) = 0.707107
+Calculated number of iterations from target FLOPs: 2,743
+Total number of training tokens: 2,876,243,968
+Tokens : Scaling params ratio: 4.23
+Total training FLOPs estimate: 1.499758e+19
+Tokens / micro-batch / rank: 16 x 4096 = 65,536
+Tokens / micro-batch: 524,288
+Total batch size 1,048,576 => gradient accumulation steps: 2
+Step 00000 | Validation bpb: 4.707967
+TRAJ_POINT | step=0 | tokens=0 | flops=0.000000e+00 | val_bpb=4.707967
+/workspace/llm-labs/core/model.py:547: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/native/ReduceOps.cpp:1839.)
+  counts_std = counts.std(dim=-1)
+/workspace/llm-labs/core/model.py:547: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/native/ReduceOps.cpp:1839.)
+  counts_std = counts.std(dim=-1)
+/workspace/llm-labs/core/model.py:547: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/native/ReduceOps.cpp:1839.)
+  counts_std = counts.std(dim=-1)
+/workspace/llm-labs/core/model.py:547: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/native/ReduceOps.cpp:1839.)
+  counts_std = counts.std(dim=-1)
+/workspace/llm-labs/core/model.py:547: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/native/ReduceOps.cpp:1839.)
+  counts_std = counts.std(dim=-1)
+/workspace/llm-labs/core/model.py:547: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/native/ReduceOps.cpp:1839.)
+  counts_std = counts.std(dim=-1)
+/workspace/llm-labs/core/model.py:547: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/native/ReduceOps.cpp:1839.)
+  counts_std = counts.std(dim=-1)
+/workspace/llm-labs/core/model.py:547: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at /opt/pytorch/pytorch/aten/src/ATen/native/ReduceOps.cpp:1839.)
+  counts_std = counts.std(dim=-1)
+step 00000/02743 (0.00%) | loss: 6.237293 | lrm: 0.03 | dt: 3615.72ms | tok/sec: 290,004 | bf16_mfu: 19.11 | epoch: 1 pq: 0 rg: 8 | total time: 0.00m
+step 00001/02743 (0.04%) | loss: 6.202482 | lrm: 0.05 | dt: 3513.30ms | tok/sec: 298,458 | bf16_mfu: 19.67 | epoch: 1 pq: 0 rg: 8 | total time: 0.00m
+step 00002/02743 (0.07%) | loss: 6.139668 | lrm: 0.07 | dt: 3480.39ms | tok/sec: 301,280 | bf16_mfu: 19.86 | epoch: 1 pq: 0 rg: 8 | total time: 0.00m
+step 00003/02743 (0.11%) | loss: 6.034865 | lrm: 0.10 | dt: 3439.94ms | tok/sec: 304,824 | bf16_mfu: 20.09 | epoch: 1 pq: 0 rg: 8 | total time: 0.00m
+step 00004/02743 (0.15%) | loss: 5.832836 | lrm: 0.12 | dt: 3483.16ms | tok/sec: 301,041 | bf16_mfu: 19.84 | epoch: 1 pq: 0 rg: 8 | total time: 0.00m
+step 00005/02743 (0.18%) | loss: 5.828688 | lrm: 0.15 | dt: 3484.33ms | tok/sec: 300,940 | bf16_mfu: 19.83 | epoch: 1 pq: 0 rg: 8 | total time: 0.00m
+step 00006/02743 (0.22%) | loss: 5.593430 | lrm: 0.17 | dt: 3488.44ms | tok/sec: 300,585 | bf16_mfu: 19.81 | epoch: 1 pq: 0 rg: 8 | total time: 0.00m
+step 00007/02743 (0.26%) | loss: 5.368876 | lrm: 0.20 | dt: 3489.26ms | tok/sec: 300,515 | bf16_mfu: 19.81 | epoch: 1 pq: 0 rg: 8 | total time: 0.00m
+step 00008/02743 (0.29%) | loss: 5.182296 | lrm: 0.23 | dt: 3452.98ms | tok/sec: 303,672 | bf16_mfu: 20.01 | epoch: 1 pq: 0 rg: 8 | total time: 0.00m
+step 00009/02743 (0.33%) | loss: 5.016932 | lrm: 0.25 | dt: 3483.18ms | tok/sec: 301,039 | bf16_mfu: 19.84 | epoch: 1 pq: 0 rg: 8 | total time: 0.00m
+step 00010/02743 (0.36%) | loss: 4.865467 | lrm: 0.28 | dt: 3507.93ms | tok/sec: 298,916 | bf16_mfu: 19.70 | epoch: 1 pq: 0 rg: 16 | total time: 0.00m
+step 00011/02743 (0.40%) | loss: 4.727834 | lrm: 0.30 | dt: 3478.81ms | tok/sec: 301,417 | bf16_mfu: 19.86 | epoch: 1 pq: 0 rg: 16 | total time: 0.06m | eta: 158.4m
+step 00012/02743 (0.44%) | loss: 4.612508 | lrm: 0.33 | dt: 3490.64ms | tok/sec: 300,396 | bf16_mfu: 19.80 | epoch: 1 pq: 0 rg: 16 | total time: 0.12m | eta: 158.6m
+step 00013/02743 (0.47%) | loss: 4.513754 | lrm: 0.35 | dt: 3494.29ms | tok/sec: 300,083 | bf16_mfu: 19.78 | epoch: 1 pq: 0 rg: 16 | total time: 0.17m | eta: 158.7m
+step 00014/02743 (0.51%) | loss: 4.428591 | lrm: 0.38 | dt: 3460.51ms | tok/sec: 303,011 | bf16_mfu: 19.97 | epoch: 1 pq: 0 rg: 16 | total time: 0.23m | eta: 158.3m
+step 00015/02743 (0.55%) | loss: 4.351266 | lrm: 0.40 | dt: 3504.40ms | tok/sec: 299,216 | bf16_mfu: 19.72 | epoch: 1 pq: 0 rg: 16 | total time: 0.29m | eta: 158.5m
+step 00016/02743 (0.58%) | loss: 4.281679 | lrm: 0.42 | dt: 3502.21ms | tok/sec: 299,403 | bf16_mfu: 19.73 | epoch: 1 pq: 0 rg: 16 | total time: 0.35m | eta: 158.6m
+step 00017/02743 (0.62%) | loss: 4.227321 | lrm: 0.45 | dt: 3504.24ms | tok/sec: 299,230 | bf16_mfu: 19.72 | epoch: 1 pq: 0 rg: 16 | total time: 0.41m | eta: 158.6m
+step 00018/02743 (0.66%) | loss: 4.169809 | lrm: 0.47 | dt: 3509.41ms | tok/sec: 298,789 | bf16_mfu: 19.69 | epoch: 1 pq: 0 rg: 16 | total time: 0.47m | eta: 158.6m
+step 00019/02743 (0.69%) | loss: 4.119970 | lrm: 0.50 | dt: 3502.15ms | tok/sec: 299,409 | bf16_mfu: 19.73 | epoch: 1 pq: 0 rg: 24 | total time: 0.52m | eta: 158.6m
+step 00020/02743 (0.73%) | loss: 4.070235 | lrm: 0.53 | dt: 3546.77ms | tok/sec: 295,642 | bf16_mfu: 19.48 | epoch: 1 pq: 0 rg: 24 | total time: 0.58m | eta: 158.8m
+step 00021/02743 (0.77%) | loss: 4.037918 | lrm: 0.55 | dt: 3511.70ms | tok/sec: 298,594 | bf16_mfu: 19.68 | epoch: 1 pq: 0 rg: 24 | total time: 0.64m | eta: 158.8m
+step 00022/02743 (0.80%) | loss: 4.003882 | lrm: 0.57 | dt: 3507.48ms | tok/sec: 298,953 | bf16_mfu: 19.70 | epoch: 1 pq: 0 rg: 24 | total time: 0.70m | eta: 158.8m
+step 00023/02743 (0.84%) | loss: 3.972601 | lrm: 0.60 | dt: 3507.80ms | tok/sec: 298,927 | bf16_mfu: 19.70 | epoch: 1 pq: 0 rg: 24 | total time: 0.76m | eta: 158.7m
+step 00024/02743 (0.87%) | loss: 3.948662 | lrm: 0.62 | dt: 3514.96ms | tok/sec: 298,317 | bf16_mfu: 19.66 | epoch: 1 pq: 0 rg: 24 | total time: 0.82m | eta: 158.7m
+step 00025/02743 (0.91%) | loss: 3.923015 | lrm: 0.65 | dt: 3476.44ms | tok/sec: 301,623 | bf16_mfu: 19.88 | epoch: 1 pq: 0 rg: 24 | total time: 0.88m | eta: 158.6m
+step 00026/02743 (0.95%) | loss: 3.905500 | lrm: 0.68 | dt: 3500.20ms | tok/sec: 299,575 | bf16_mfu: 19.74 | epoch: 1 pq: 0 rg: 24 | total time: 0.93m | eta: 158.5m
+step 00027/02743 (0.98%) | loss: 3.885835 | lrm: 0.70 | dt: 3515.70ms | tok/sec: 298,254 | bf16_mfu: 19.66 | epoch: 1 pq: 0 rg: 24 | total time: 0.99m | eta: 158.5m
+step 00028/02743 (1.02%) | loss: 3.873354 | lrm: 0.72 | dt: 3526.33ms | tok/sec: 297,356 | bf16_mfu: 19.60 | epoch: 1 pq: 0 rg: 24 | total time: 1.05m | eta: 158.5m
+step 00029/02743 (1.06%) | loss: 3.859832 | lrm: 0.75 | dt: 3543.17ms | tok/sec: 295,942 | bf16_mfu: 19.50 | epoch: 1 pq: 0 rg: 32 | total time: 1.11m | eta: 158.5m
+step 00030/02743 (1.09%) | loss: 3.841153 | lrm: 0.78 | dt: 3554.87ms | tok/sec: 294,968 | bf16_mfu: 19.44 | epoch: 1 pq: 0 rg: 32 | total time: 1.17m | eta: 158.6m
+step 00031/02743 (1.13%) | loss: 3.830660 | lrm: 0.80 | dt: 3549.28ms | tok/sec: 295,433 | bf16_mfu: 19.47 | epoch: 1 pq: 0 rg: 32 | total time: 1.23m | eta: 158.6m
+step 00032/02743 (1.17%) | loss: 3.818285 | lrm: 0.82 | dt: 3497.79ms | tok/sec: 299,782 | bf16_mfu: 19.76 | epoch: 1 pq: 0 rg: 32 | total time: 1.29m | eta: 158.6m
+step 00033/02743 (1.20%) | loss: 3.812654 | lrm: 0.85 | dt: 3512.35ms | tok/sec: 298,539 | bf16_mfu: 19.67 | epoch: 1 pq: 0 rg: 32 | total time: 1.35m | eta: 158.5m
+step 00034/02743 (1.24%) | loss: 3.806371 | lrm: 0.88 | dt: 3507.31ms | tok/sec: 298,969 | bf16_mfu: 19.70 | epoch: 1 pq: 0 rg: 32 | total time: 1.40m | eta: 158.4m
+step 00035/02743 (1.28%) | loss: 3.804457 | lrm: 0.90 | dt: 3505.06ms | tok/sec: 299,160 | bf16_mfu: 19.72 | epoch: 1 pq: 0 rg: 32 | total time: 1.46m | eta: 158.4m
+step 00036/02743 (1.31%) | loss: 3.796685 | lrm: 0.93 | dt: 3466.74ms | tok/sec: 302,467 | bf16_mfu: 19.93 | epoch: 1 pq: 0 rg: 32 | total time: 1.52m | eta: 158.2m
+step 00037/02743 (1.35%) | loss: 3.788059 | lrm: 0.95 | dt: 3492.03ms | tok/sec: 300,276 | bf16_mfu: 19.79 | epoch: 1 pq: 0 rg: 32 | total time: 1.58m | eta: 158.2m
+step 00038/02743 (1.39%) | loss: 3.778781 | lrm: 0.97 | dt: 3501.87ms | tok/sec: 299,433 | bf16_mfu: 19.73 | epoch: 1 pq: 0 rg: 32 | total time: 1.64m | eta: 158.1m
+step 00039/02743 (1.42%) | loss: 3.770699 | lrm: 1.00 | dt: 3539.18ms | tok/sec: 296,276 | bf16_mfu: 19.53 | epoch: 1 pq: 0 rg: 40 | total time: 1.70m | eta: 158.1m
+step 00040/02743 (1.46%) | loss: 3.772075 | lrm: 1.00 | dt: 3508.71ms | tok/sec: 298,849 | bf16_mfu: 19.70 | epoch: 1 pq: 0 rg: 40 | total time: 1.75m | eta: 158.0m
+step 00041/02743 (1.49%) | loss: 3.770427 | lrm: 1.00 | dt: 3525.92ms | tok/sec: 297,390 | bf16_mfu: 19.60 | epoch: 1 pq: 0 rg: 40 | total time: 1.81m | eta: 158.0m
+step 00042/02743 (1.53%) | loss: 3.764375 | lrm: 1.00 | dt: 3532.24ms | tok/sec: 296,858 | bf16_mfu: 19.56 | epoch: 1 pq: 0 rg: 40 | total time: 1.87m | eta: 158.0m
+step 00043/02743 (1.57%) | loss: 3.759704 | lrm: 1.00 | dt: 3478.27ms | tok/sec: 301,464 | bf16_mfu: 19.87 | epoch: 1 pq: 0 rg: 40 | total time: 1.93m | eta: 157.9m
+step 00044/02743 (1.60%) | loss: 3.751107 | lrm: 1.00 | dt: 3543.33ms | tok/sec: 295,929 | bf16_mfu: 19.50 | epoch: 1 pq: 0 rg: 40 | total time: 1.99m | eta: 157.9m
+step 00045/02743 (1.64%) | loss: 3.742280 | lrm: 1.00 | dt: 3514.78ms | tok/sec: 298,333 | bf16_mfu: 19.66 | epoch: 1 pq: 0 rg: 40 | total time: 2.05m | eta: 157.8m
+step 00046/02743 (1.68%) | loss: 3.731939 | lrm: 1.00 | dt: 3509.87ms | tok/sec: 298,750 | bf16_mfu: 19.69 | epoch: 1 pq: 0 rg: 40 | total time: 2.11m | eta: 157.7m
+step 00047/02743 (1.71%) | loss: 3.722430 | lrm: 1.00 | dt: 3523.42ms | tok/sec: 297,602 | bf16_mfu: 19.61 | epoch: 1 pq: 0 rg: 40 | total time: 2.16m | eta: 157.7m
+step 00048/02743 (1.75%) | loss: 3.708423 | lrm: 1.00 | dt: 3555.23ms | tok/sec: 294,939 | bf16_mfu: 19.44 | epoch: 1 pq: 0 rg: 48 | total time: 2.22m | eta: 157.7m
+step 00049/02743 (1.79%) | loss: 3.698396 | lrm: 1.00 | dt: 3515.75ms | tok/sec: 298,250 | bf16_mfu: 19.66 | epoch: 1 pq: 0 rg: 48 | total time: 2.28m | eta: 157.6m
+step 00050/02743 (1.82%) | loss: 3.684973 | lrm: 1.00 | dt: 3482.63ms | tok/sec: 301,087 | bf16_mfu: 19.84 | epoch: 1 pq: 0 rg: 48 | total time: 2.34m | eta: 157.6m
+step 00051/02743 (1.86%) | loss: 3.673214 | lrm: 1.00 | dt: 3512.55ms | tok/sec: 298,522 | bf16_mfu: 19.67 | epoch: 1 pq: 0 rg: 48 | total time: 2.40m | eta: 157.5m
+step 00052/02743 (1.90%) | loss: 3.655685 | lrm: 1.00 | dt: 3523.43ms | tok/sec: 297,600 | bf16_mfu: 19.61 | epoch: 1 pq: 0 rg: 48 | total time: 2.46m | eta: 157.5m
+step 00053/02743 (1.93%) | loss: 3.638117 | lrm: 1.00 | dt: 3541.63ms | tok/sec: 296,071 | bf16_mfu: 19.51 | epoch: 1 pq: 0 rg: 48 | total time: 2.52m | eta: 157.4m
+step 00054/02743 (1.97%) | loss: 3.618928 | lrm: 1.00 | dt: 3518.72ms | tok/sec: 297,999 | bf16_mfu: 19.64 | epoch: 1 pq: 0 rg: 48 | total time: 2.58m | eta: 157.4m
+step 00055/02743 (2.01%) | loss: 3.605271 | lrm: 1.00 | dt: 3532.62ms | tok/sec: 296,826 | bf16_mfu: 19.56 | epoch: 1 pq: 0 rg: 48 | total time: 2.63m | eta: 157.3m
+step 00056/02743 (2.04%) | loss: 3.594074 | lrm: 1.00 | dt: 3521.26ms | tok/sec: 297,784 | bf16_mfu: 19.63 | epoch: 1 pq: 0 rg: 48 | total time: 2.69m | eta: 157.3m
+step 00057/02743 (2.08%) | loss: 3.578143 | lrm: 1.00 | dt: 3550.67ms | tok/sec: 295,318 | bf16_mfu: 19.46 | epoch: 1 pq: 0 rg: 56 | total time: 2.75m | eta: 157.3m
+step 00058/02743 (2.11%) | loss: 3.561383 | lrm: 1.00 | dt: 3475.67ms | tok/sec: 301,690 | bf16_mfu: 19.88 | epoch: 1 pq: 0 rg: 56 | total time: 2.81m | eta: 157.2m
+step 00059/02743 (2.15%) | loss: 3.546591 | lrm: 1.00 | dt: 3505.28ms | tok/sec: 299,141 | bf16_mfu: 19.71 | epoch: 1 pq: 0 rg: 56 | total time: 2.87m | eta: 157.1m
+step 00060/02743 (2.19%) | loss: 3.527609 | lrm: 1.00 | dt: 3511.04ms | tok/sec: 298,651 | bf16_mfu: 19.68 | epoch: 1 pq: 0 rg: 56 | total time: 2.93m | eta: 157.1m
+step 00061/02743 (2.22%) | loss: 3.509439 | lrm: 1.00 | dt: 3508.07ms | tok/sec: 298,903 | bf16_mfu: 19.70 | epoch: 1 pq: 0 rg: 56 | total time: 2.99m | eta: 157.0m
+step 00062/02743 (2.26%) | loss: 3.493920 | lrm: 1.00 | dt: 3498.31ms | tok/sec: 299,737 | bf16_mfu: 19.75 | epoch: 1 pq: 0 rg: 56 | total time: 3.04m | eta: 156.9m
+step 00063/02743 (2.30%) | loss: 3.477716 | lrm: 1.00 | dt: 3510.24ms | tok/sec: 298,719 | bf16_mfu: 19.69 | epoch: 1 pq: 0 rg: 56 | total time: 3.10m | eta: 156.9m
+step 00064/02743 (2.33%) | loss: 3.460435 | lrm: 1.00 | dt: 3507.31ms | tok/sec: 298,968 | bf16_mfu: 19.70 | epoch: 1 pq: 0 rg: 56 | total time: 3.16m | eta: 156.8m
+step 00065/02743 (2.37%) | loss: 3.444859 | lrm: 1.00 | dt: 3515.02ms | tok/sec: 298,312 | bf16_mfu: 19.66 | epoch: 1 pq: 0 rg: 56 | total time: 3.22m | eta: 156.7m
+step 00066/02743 (2.41%) | loss: 3.433763 | lrm: 1.00 | dt: 3497.55ms | tok/sec: 299,802 | bf16_mfu: 19.76 | epoch: 1 pq: 0 rg: 64 | total time: 3.28m | eta: 156.7m
+step 00067/02743 (2.44%) | loss: 3.416973 | lrm: 1.00 | dt: 3530.67ms | tok/sec: 296,990 | bf16_mfu: 19.57 | epoch: 1 pq: 0 rg: 64 | total time: 3.34m | eta: 156.6m
+step 00068/02743 (2.48%) | loss: 3.402860 | lrm: 1.00 | dt: 3513.43ms | tok/sec: 298,447 | bf16_mfu: 19.67 | epoch: 1 pq: 0 rg: 64 | total time: 3.39m | eta: 156.6m
+step 00069/02743 (2.52%) | loss: 3.383429 | lrm: 1.00 | dt: 3518.27ms | tok/sec: 298,037 | bf16_mfu: 19.64 | epoch: 1 pq: 0 rg: 64 | total time: 3.45m | eta: 156.5m
+step 00070/02743 (2.55%) | loss: 3.360411 | lrm: 1.00 | dt: 3528.18ms | tok/sec: 297,200 | bf16_mfu: 19.59 | epoch: 1 pq: 0 rg: 64 | total time: 3.51m | eta: 156.5m
+step 00071/02743 (2.59%) | loss: 3.334240 | lrm: 1.00 | dt: 3523.61ms | tok/sec: 297,585 | bf16_mfu: 19.61 | epoch: 1 pq: 0 rg: 64 | total time: 3.57m | eta: 156.4m
+step 00072/02743 (2.62%) | loss: 3.305444 | lrm: 1.00 | dt: 3546.59ms | tok/sec: 295,657 | bf16_mfu: 19.48 | epoch: 1 pq: 0 rg: 64 | total time: 3.63m | eta: 156.4m
+step 00073/02743 (2.66%) | loss: 3.287657 | lrm: 1.00 | dt: 3531.71ms | tok/sec: 296,903 | bf16_mfu: 19.57 | epoch: 1 pq: 0 rg: 64 | total time: 3.69m | eta: 156.3m
+step 00074/02743 (2.70%) | loss: 3.268949 | lrm: 1.00 | dt: 3486.10ms | tok/sec: 300,787 | bf16_mfu: 19.82 | epoch: 1 pq: 0 rg: 64 | total time: 3.75m | eta: 156.3m
+step 00075/02743 (2.73%) | loss: 3.249562 | lrm: 1.00 | dt: 3519.19ms | tok/sec: 297,959 | bf16_mfu: 19.64 | epoch: 1 pq: 0 rg: 72 | total time: 3.81m | eta: 156.2m
+step 00076/02743 (2.77%) | loss: 3.234128 | lrm: 1.00 | dt: 3551.81ms | tok/sec: 295,222 | bf16_mfu: 19.46 | epoch: 1 pq: 0 rg: 72 | total time: 3.86m | eta: 156.2m
+step 00077/02743 (2.81%) | loss: 3.213321 | lrm: 1.00 | dt: 3518.61ms | tok/sec: 298,008 | bf16_mfu: 19.64 | epoch: 1 pq: 0 rg: 72 | total time: 3.92m | eta: 156.1m
+step 00078/02743 (2.84%) | loss: 3.191530 | lrm: 1.00 | dt: 3516.75ms | tok/sec: 298,165 | bf16_mfu: 19.65 | epoch: 1 pq: 0 rg: 72 | total time: 3.98m | eta: 156.1m
+step 00079/02743 (2.88%) | loss: 3.171699 | lrm: 1.00 | dt: 3517.54ms | tok/sec: 298,099 | bf16_mfu: 19.65 | epoch: 1 pq: 0 rg: 72 | total time: 4.04m | eta: 156.0m
+step 00080/02743 (2.92%) | loss: 3.155825 | lrm: 1.00 | dt: 3513.56ms | tok/sec: 298,437 | bf16_mfu: 19.67 | epoch: 1 pq: 0 rg: 72 | total time: 4.10m | eta: 155.9m
+step 00081/02743 (2.95%) | loss: 3.139371 | lrm: 1.00 | dt: 3510.39ms | tok/sec: 298,706 | bf16_mfu: 19.69 | epoch: 1 pq: 0 rg: 72 | total time: 4.16m | eta: 155.9m
+step 00082/02743 (2.99%) | loss: 3.118636 | lrm: 1.00 | dt: 3523.32ms | tok/sec: 297,610 | bf16_mfu: 19.61 | epoch: 1 pq: 0 rg: 72 | total time: 4.22m | eta: 155.8m
+step 00083/02743 (3.03%) | loss: 3.100847 | lrm: 1.00 | dt: 3470.45ms | tok/sec: 302,144 | bf16_mfu: 19.91 | epoch: 1 pq: 0 rg: 72 | total time: 4.27m | eta: 155.8m
+step 00084/02743 (3.06%) | loss: 3.084584 | lrm: 1.00 | dt: 3536.76ms | tok/sec: 296,478 | bf16_mfu: 19.54 | epoch: 1 pq: 0 rg: 80 | total time: 4.33m | eta: 155.7m
+step 00085/02743 (3.10%) | loss: 3.068668 | lrm: 1.00 | dt: 3522.14ms | tok/sec: 297,709 | bf16_mfu: 19.62 | epoch: 1 pq: 0 rg: 80 | total time: 4.39m | eta: 155.7m
+step 00086/02743 (3.14%) | loss: 3.050197 | lrm: 1.00 | dt: 3508.02ms | tok/sec: 298,907 | bf16_mfu: 19.70 | epoch: 1 pq: 0 rg: 80 | total time: 4.45m | eta: 155.6m
+step 00087/02743 (3.17%) | loss: 3.029417 | lrm: 1.00 | dt: 3524.95ms | tok/sec: 297,472 | bf16_mfu: 19.60 | epoch: 1 pq: 0 rg: 80 | total time: 4.51m | eta: 155.5m
+step 00088/02743 (3.21%) | loss: 3.001979 | lrm: 1.00 | dt: 3515.72ms | tok/sec: 298,253 | bf16_mfu: 19.66 | epoch: 1 pq: 0 rg: 80 | total time: 4.57m | eta: 155.5m
+step 00089/02743 (3.24%) | loss: 2.982169 | lrm: 1.00 | dt: 3522.10ms | tok/sec: 297,713 | bf16_mfu: 19.62 | epoch: 1 pq: 0 rg: 80 | total time: 4.63m | eta: 155.4m
+step 00090/02743 (3.28%) | loss: 2.957690 | lrm: 1.00 | dt: 3515.87ms | tok/sec: 298,240 | bf16_mfu: 19.66 | epoch: 1 pq: 0 rg: 80 | total time: 4.69m | eta: 155.4m
+step 00091/02743 (3.32%) | loss: 2.935625 | lrm: 1.00 | dt: 3511.51ms | tok/sec: 298,610 | bf16_mfu: 19.68 | epoch: 1 pq: 0 rg: 80 | total time: 4.74m | eta: 155.3m
+step 00092/02743 (3.35%) | loss: 2.918036 | lrm: 1.00 | dt: 3468.84ms | tok/sec: 302,284 | bf16_mfu: 19.92 | epoch: 1 pq: 0 rg: 80 | total time: 4.80m | eta: 155.2m
+step 00093/02743 (3.39%) | loss: 2.906937 | lrm: 1.00 | dt: 3502.48ms | tok/sec: 299,381 | bf16_mfu: 19.73 | epoch: 1 pq: 1 rg: 0 | total time: 4.86m | eta: 155.2m
+step 00094/02743 (3.43%) | loss: 2.891608 | lrm: 1.00 | dt: 3525.22ms | tok/sec: 297,449 | bf16_mfu: 19.60 | epoch: 1 pq: 1 rg: 0 | total time: 4.92m | eta: 155.1m
+step 00095/02743 (3.46%) | loss: 2.874833 | lrm: 1.00 | dt: 3513.33ms | tok/sec: 298,456 | bf16_mfu: 19.67 | epoch: 1 pq: 1 rg: 0 | total time: 4.98m | eta: 155.1m
+step 00096/02743 (3.50%) | loss: 2.863619 | lrm: 1.00 | dt: 3501.85ms | tok/sec: 299,434 | bf16_mfu: 19.73 | epoch: 1 pq: 1 rg: 0 | total time: 5.04m | eta: 155.0m
+step 00097/02743 (3.54%) | loss: 2.840888 | lrm: 1.00 | dt: 3529.38ms | tok/sec: 297,099 | bf16_mfu: 19.58 | epoch: 1 pq: 1 rg: 0 | total time: 5.09m | eta: 154.9m
+step 00098/02743 (3.57%) | loss: 2.823836 | lrm: 1.00 | dt: 3508.77ms | tok/sec: 298,844 | bf16_mfu: 19.69 | epoch: 1 pq: 1 rg: 0 | total time: 5.15m | eta: 154.9m
+step 00099/02743 (3.61%) | loss: 2.806671 | lrm: 1.00 | dt: 3543.31ms | tok/sec: 295,930 | bf16_mfu: 19.50 | epoch: 1 pq: 1 rg: 0 | total time: 5.21m | eta: 154.8m
+step 00100/02743 (3.65%) | loss: 2.787511 | lrm: 1.00 | dt: 3517.47ms | tok/sec: 298,105 | bf16_mfu: 19.65 | epoch: 1 pq: 1 rg: 0 | total time: 5.27m | eta: 154.8m
